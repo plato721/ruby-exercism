@@ -2,7 +2,18 @@ class Cipher
   attr_reader :key
 
   def initialize(key = nil)
+    check_key(key) if !key.nil?
     @key = key || init_key
+  end
+
+  def check_key(key)
+    key.chars.each do |char|
+      bad_key if !(char =~ /[a-z]{1}/)
+    end
+  end
+
+  def bad_key
+    raise ArgumentError, "Key must be all lowercase letters"
   end
 
   def encode(plain)
