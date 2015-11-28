@@ -17,19 +17,16 @@ class RandomKeyCipherTest < Minitest::Test
   # outputs the key. This is a critical problem with shift ciphers, some
   # characters will always output the key verbatim.
   def test_cipher_encode
-    skip
     plaintext = 'aaaaaaaaaa'
     assert_equal(@cipher.key[0, 10], @cipher.encode(plaintext))
   end
 
   def test_cipher_decode
-    skip
     plaintext = 'aaaaaaaaaa'
     assert_equal(plaintext, @cipher.decode(@cipher.key[0, 10]))
   end
 
   def test_cipher_reversible
-    skip
     plaintext = 'abcdefghij'
     assert_equal(plaintext, @cipher.decode(@cipher.encode(plaintext)))
   end
