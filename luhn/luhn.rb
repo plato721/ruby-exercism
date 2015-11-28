@@ -28,7 +28,7 @@ class Luhn
 
   private
   def raw_addends
-    num.to_s.reverse.split("").map.with_index do |digit, index|
+    num.to_s.reverse.chars.map.with_index do |digit, index|
       index.odd? ? digit.to_i * 2 : digit.to_i
     end.reverse
   end
