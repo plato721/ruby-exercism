@@ -7,6 +7,7 @@ class Cipher
   end
 
   def check_key(key)
+    bad_key if key.empty?
     key.chars.each do |char|
       bad_key if !(char =~ /[a-z]{1}/)
     end
