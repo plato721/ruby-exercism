@@ -20,4 +20,9 @@ class Robot
     index = (legal_bearing.index(self.bearing) + 1) % 4
     self.orient(legal_bearing[index])
   end
+
+  def turn_left
+    index = (legal_bearing.index(self.bearing) - 1 + 4) % 4
+    self.orient(legal_bearing[index])
+  end
 end
