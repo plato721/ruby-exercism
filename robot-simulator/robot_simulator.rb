@@ -9,6 +9,19 @@ class Simulator
      'A' => :advance
     }
   end
+
+  def place(*args)
+    robot = args.shift
+    args = args.shift
+    robot.at(args[:x], args[:y])
+    robot.orient(args[:direction])
+  end
+
+  def evaluate(robot, short_commands)
+    self.instructions(short_commands).each do |command|
+      robot.send(command)
+    end 
+  end
 end
 
 
