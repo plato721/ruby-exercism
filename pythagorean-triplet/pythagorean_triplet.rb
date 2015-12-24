@@ -20,8 +20,7 @@ class Triplet
   end
 
   def self.triples_for(max)
-    triples = []
-    [*1..max].each do |c|
+    [*1..max].each_with_object([]) do |c, triples|
       [*1..max].each do |b|
         [*1..max].each do |a|
           triple = new(a, b, c)
@@ -29,7 +28,6 @@ class Triplet
         end
       end
     end
-    triples.uniq
   end
 
   def self.remove_dups(triples)
