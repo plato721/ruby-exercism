@@ -16,4 +16,8 @@ class Robot
     self.bearing = dir
   end
 
+  def turn_right
+    index = (legal_bearing.index(self.bearing) + 1) % 4
+    self.orient(legal_bearing[index])
+  end
 end
