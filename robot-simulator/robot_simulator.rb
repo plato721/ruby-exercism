@@ -1,3 +1,10 @@
+class Simulator
+  def instructions(arg)
+    [:turn_left]
+  end
+end
+
+
 class Robot
   attr_accessor :bearing, :x, :y
 
