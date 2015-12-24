@@ -28,14 +28,12 @@ class TripletTest < Minitest::Test
   end
 
   def test_triplets_from_11_upto_20
-    skip
     triplets = Triplet.where(min_factor: 11, max_factor: 20)
     products = triplets.map(&:product).sort
     assert_equal [3840], products
   end
 
   def test_triplets_where_sum_x
-    skip
     triplets = Triplet.where(sum: 180, max_factor: 100)
     products = triplets.map(&:product).sort
     assert_equal [118_080, 168_480, 202_500], products

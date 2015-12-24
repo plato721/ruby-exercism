@@ -38,12 +38,28 @@ class Triplet
     end
   end
 
+  def self.above_min?(triple, min)
+    triple.a > min && triple.b > min && triple.c > min
+  end
+
+  def self.apply_min(triples, min)
+    triples.each_with_object([]) do |triple, min_checked|
+      min_checked << triple if above_min?(triple, min)
+    end
+  end
+
+  def self.apply_sum(triples, sum)
+    triples.each_with_object([]) do |triple, sum_checked|
+      sum_checked << triple if triple.sum == sum
+    end
+  end
+
   def self.where(args)
     check_max_factor(args)
     triples = triples_for(args[:max_factor])
     triples = remove_dups(triples)
-    triples = apply_min(triples, min) if args[:min_factor]
-    triples = apply_sum(triples, sum) if args[:sum]
+    triples = apply_min(triples, args[:min_factor]) if args[:min_factor]
+    triples = apply_sum(triples, args[:sum]) if args[:sum]
     triples
   end
 
