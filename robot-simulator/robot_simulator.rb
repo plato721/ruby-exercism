@@ -26,6 +26,13 @@ class Robot
     self.orient(legal_bearing[index])
   end
 
+  def advance
+    self.y += 1 if self.bearing == :north
+    self.y -= 1 if self.bearing == :south
+    self.x += 1 if self.bearing == :east
+    self.x -= 1 if self.bearing == :west
+  end
+
   def at(x, y)
     self.x = x
     self.y = y
