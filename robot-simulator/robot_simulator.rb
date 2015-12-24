@@ -1,6 +1,13 @@
 class Simulator
-  def instructions(arg)
-    [:turn_left]
+  def instructions(args)
+    args.chars.map {|char| instructions_map[char]}
+  end
+
+  def instructions_map
+    {'L' => :turn_left,
+     'R' => :turn_right,
+     'A' => :advance
+    }
   end
 end
 
