@@ -2,6 +2,9 @@ class CircularBuffer
   class BufferEmptyException < Exception
   end
 
+  class BufferFullException < Exception
+  end
+
   attr_accessor :buffer
   attr_reader :size
 
@@ -10,17 +13,31 @@ class CircularBuffer
     @buffer = []
   end
 
-  def write(data)
-    self.buffer << data if buffer.length < self.size
+  def full?
+    buffer.length == size
+  end
+
+  def empty?
+    buffer.empty?
   end
 
   def read
-    raise BufferEmptyException if buffer.empty?
+    raise BufferEmptyException if empty?
     buffer.shift
+  end
+
+  def write(data)
+    raise BufferFullException if full?
+    self.buffer << data if !data.nil?
+  end
+
+  def write!(data)
+    return if data.nil?
+    buffer.shift if full?
+    write(data)
   end
 
   def clear
     self.buffer.clear
   end
-
 end
