@@ -14,7 +14,6 @@ class Seriestest < Minitest::Test
   end
 
   def test_another_tiny_number
-    skip
     series = Series.new('19')
     assert_equal 9, series.largest_product(2)
   end

@@ -1,8 +1,11 @@
 class Series
-  def initialize(arg)
+  attr_reader :sequence
+
+  def initialize(sequence)
+    @sequence = sequence.chars.map(&:to_i)
   end
 
   def largest_product(length)
-    2
+    sequence.inject(:*)
   end
 end
