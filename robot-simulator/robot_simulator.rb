@@ -4,26 +4,22 @@ class Simulator
   end
 
   def instructions_map
-    {'L' => :turn_left,
-     'R' => :turn_right,
-     'A' => :advance
-    }
+    { 'L' => :turn_left,
+      'R' => :turn_right,
+      'A' => :advance }
   end
 
   def place(*args)
     robot = args.shift
-    args = args.shift
-    robot.at(args[:x], args[:y])
-    robot.orient(args[:direction])
+    robot_config = args.shift
+    robot.at(robot_config[:x], robot_config[:y])
+    robot.orient(robot_config[:direction])
   end
 
   def evaluate(robot, short_commands)
-    self.instructions(short_commands).each do |command|
-      robot.send(command)
-    end 
+    self.instructions(short_commands).each {|command| robot.send(command)}
   end
 end
-
 
 class Robot
   attr_accessor :bearing, :x, :y
