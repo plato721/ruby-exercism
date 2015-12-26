@@ -86,7 +86,6 @@ class CustomSetTest < Minitest::Test
   end
 
   def test_to_a
-    skip
     assert_equal [], CustomSet.new.to_a.sort
     assert_equal [1, 2, 3], CustomSet.new([3, 1, 2]).to_a.sort
     assert_equal [1, 2, 3], CustomSet.new([3, 1, 2, 1]).to_a.sort
