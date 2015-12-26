@@ -71,7 +71,6 @@ class CustomSetTest < Minitest::Test
   end
 
   def test_size
-    skip
     assert_equal 0, CustomSet.new.size
     assert_equal 3, CustomSet.new([1, 2, 3]).size
     assert_equal 3, CustomSet.new([1, 2, 3, 2]).size

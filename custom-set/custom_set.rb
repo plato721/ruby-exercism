@@ -55,6 +55,10 @@ class CustomSet
     self
   end
 
+  def size
+    self.set.length
+  end
+
   def each
     self.set.each { |element| yield element }
   end
