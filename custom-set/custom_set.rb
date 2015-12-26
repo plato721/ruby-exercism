@@ -46,7 +46,8 @@ class CustomSet
   end
 
   def empty
-    CustomSet.new(self.set.clear)
+    self.set.clear
+    self
   end
 
   def put(value)
