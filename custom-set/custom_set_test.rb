@@ -45,7 +45,6 @@ class CustomSetTest < Minitest::Test
 
   # rubocop:disable Metrics/LineLength
   def test_intersection
-    skip
     assert_equal CustomSet.new([:a, :c]),
                  CustomSet.new([:a, :b, :c]).intersection(CustomSet.new([:a, :c, :d]))
 
