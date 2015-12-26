@@ -8,9 +8,7 @@ class BinarySearch
   end
 
   def check_sorted(list)
-    if !sorted?(list)
-      raise ArgumentError, "Must provide a sorted list"
-    end
+    raise ArgumentError, "Must provide a sorted list" if !sorted?(list)
   end
 
   def search_for(num)
@@ -41,18 +39,17 @@ class BinarySearch
 
   def search(args)
     args[:mid] = (args[:lower] + args[:upper]) / 2
-    return args[:mid] if list[args[:mid]] == args[:num]
+    return args[:mid] if list[args[:mid]] == args[:num] # found
     new_options = get_search_options(args)
-    return nil if !new_options
-    search(new_options)
+    return nil if !new_options                          # not found
+    search(new_options)                                 # keep looking
   end
-
 
   def sorted?(array)
     array.sort == array
   end
 
-  # Totally worthless function
+  # Totally worthless function included only to make test pass
   def middle
     midpoint = list.length / 2
   end
