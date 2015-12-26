@@ -28,10 +28,7 @@ class CustomSet
   end
 
   def difference(other)
-    items = self.each_with_object([]) do |element, differences|
-      differences << element if !other.member?(element)
-    end
-    CustomSet.new(items)
+    CustomSet.new(self.select { |e| !other.member?(e) })
   end
 
   def disjoint?(other)
@@ -39,10 +36,7 @@ class CustomSet
   end
 
   def intersection(other)
-    elements = self.each_with_object([]) do |element, commons|
-      commons << element if other.member?(element)
-    end
-    CustomSet.new(elements)
+    CustomSet.new( self.select { |e| other.member?(e) })
   end
 
   def empty
