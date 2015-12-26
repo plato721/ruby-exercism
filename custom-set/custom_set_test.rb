@@ -77,7 +77,6 @@ class CustomSetTest < Minitest::Test
   end
 
   def test_subset?
-    skip
     assert CustomSet.new([1, 2, 3]).subset?(CustomSet.new([1, 2, 3]))
     assert CustomSet.new([4, 1, 2, 3]).subset?(CustomSet.new([1, 2, 3]))
     refute CustomSet.new([4, 1, 3]).subset?(CustomSet.new([1, 2, 3]))

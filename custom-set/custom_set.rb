@@ -59,6 +59,10 @@ class CustomSet
     self.set.length
   end
 
+  def subset?(other)
+    other.intersection(self) == other
+  end
+
   def each
     self.set.each { |element| yield element }
   end
