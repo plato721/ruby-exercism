@@ -17,7 +17,6 @@ class BinarySearchTest < Minitest::Test
   end
 
   def test_it_raises_error_for_data_not_in_list
-    skip
     assert_raises RuntimeError do
       BinarySearch.new([1, 3, 6]).search_for(2)
     end
