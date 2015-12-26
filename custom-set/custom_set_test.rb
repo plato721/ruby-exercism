@@ -53,7 +53,6 @@ class CustomSetTest < Minitest::Test
   end
 
   def test_member?
-    skip
     assert CustomSet.new([1, 2, 3]).member?(2)
     assert CustomSet.new(1..3).member?(2)
     refute CustomSet.new(1..3).member?(2.0)
