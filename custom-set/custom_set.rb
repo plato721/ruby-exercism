@@ -1,4 +1,5 @@
 class CustomSet
+  include Enumerable
   attr_accessor :set
 
   def initialize(collection = [])
@@ -46,5 +47,15 @@ class CustomSet
 
   def empty
     CustomSet.new(self.set.clear)
+  end
+
+  def put(value)
+    self.set << value if !member?(value)
+    self.set.sort!
+    self
+  end
+
+  def each
+    self.set.each { |element| yield element }
   end
 end
