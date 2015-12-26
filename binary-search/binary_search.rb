@@ -22,30 +22,26 @@ class BinarySearch
     raise "The search value is not in the list"
   end
 
-
   def lower_options(args)
-    mid = (args[:lower] + args[:upper]) / 2
-    args[:upper] = mid - 1
+    args[:upper] = args[:mid] - 1
     return nil if args[:upper] < args[:lower]
     args
   end
 
   def upper_options(args)
-    mid = (args[:lower] + args[:upper]) / 2
-    args[:lower] = mid + 1
+    args[:lower] = args[:mid] + 1
     return nil if args[:lower] > args[:upper]
     args
   end
 
   def get_search_options(args)
-    mid = (args[:lower] + args[:upper]) / 2
-    return lower_options(args) if args[:num] < list[mid]
-    return upper_options(args) if args[:num] > list[mid]
+    return lower_options(args) if args[:num] < list[args[:mid]]
+    return upper_options(args) if args[:num] > list[args[:mid]]
   end
 
   def search(args)
-    mid = (args[:lower] + args[:upper]) / 2
-    return mid if list[mid] == args[:num]
+    args[:mid] = (args[:lower] + args[:upper]) / 2
+    return args[:mid] if list[args[:mid]] == args[:num]
     new_options = get_search_options(args)
     return nil if !new_options
     search(new_options)
