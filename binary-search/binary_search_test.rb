@@ -11,7 +11,6 @@ class BinarySearchTest < Minitest::Test
   end
 
   def test_it_raises_error_for_unsorted_list
-    skip
     assert_raises ArgumentError do
       BinarySearch.new([2, 1, 4, 3, 6])
     end
