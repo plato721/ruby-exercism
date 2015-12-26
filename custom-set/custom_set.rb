@@ -63,6 +63,11 @@ class CustomSet
     other.intersection(self) == other
   end
 
+  def union(other)
+    other.each { |element| self.put(element) }
+    self
+  end
+
   def each
     self.set.each { |element| yield element }
   end

@@ -92,7 +92,6 @@ class CustomSetTest < Minitest::Test
   end
 
   def test_union # rubocop:disable Metrics/MethodLength
-    skip
     assert_equal CustomSet.new([3, 2, 1]),
                  CustomSet.new([1, 3]).union(CustomSet.new([2]))
     assert_equal CustomSet.new([3.0, 3, 2, 1]),
