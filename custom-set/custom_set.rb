@@ -35,4 +35,8 @@ class CustomSet
   def disjoint?(other)
     difference(other) == self
   end
+
+  def empty
+    CustomSet.new(self.set.clear)
+  end
 end

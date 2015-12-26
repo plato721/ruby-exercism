@@ -39,7 +39,6 @@ class CustomSetTest < Minitest::Test
   end
 
   def test_empty
-    skip
     assert_equal CustomSet.new, CustomSet.new([1, 2]).empty
     assert_equal CustomSet.new, CustomSet.new.empty
   end
