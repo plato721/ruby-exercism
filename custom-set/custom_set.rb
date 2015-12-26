@@ -22,13 +22,12 @@ class CustomSet
   end
 
   def delete(value)
-    return CustomSet.new(self.set) if !member?(value)
-    self.set.delete(value)
-    CustomSet.new(self.set)
+    self.set.delete(value) if member?(value)
+    self
   end
 
   def difference(other)
-    CustomSet.new(self.select { |e| !other.member?(e) })
+    CustomSet.new(self.select { |element| !other.member?(element) })
   end
 
   def disjoint?(other)
@@ -36,7 +35,7 @@ class CustomSet
   end
 
   def intersection(other)
-    CustomSet.new( self.select { |e| other.member?(e) })
+    CustomSet.new(self.select { |element| other.member?(element) })
   end
 
   def empty
