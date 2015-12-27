@@ -22,8 +22,7 @@ class CustomSet
   end
 
   def delete(value)
-    self.set.delete(value) if member?(value)
-    self
+    tap { self.set.delete(value) if member?(value) }
   end
 
   def difference(other)
@@ -39,14 +38,12 @@ class CustomSet
   end
 
   def empty
-    self.set.clear
-    self
+    tap { self.set.clear }
   end
 
   def put(value)
     self.set << value if !member?(value)
-    self.set.sort!
-    self
+    tap { self.set.sort! }
   end
 
   def size
@@ -58,8 +55,7 @@ class CustomSet
   end
 
   def union(other)
-    other.each { |element| self.put(element) }
-    self
+    tap { other.each { |element| self.put(element) } }
   end
 
   def each
