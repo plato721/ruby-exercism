@@ -9,11 +9,20 @@ class Phrase
     phrase.downcase.split(/[ \n,]/)
   end
 
+  def scrub_words(words)
+    words.select { |word| word =~ word_matcher }
+    .map { |word| word.match(word_matcher).to_s }
+  end
+
   def word_count
     words = to_words(self.phrase)
-    words.each_with_object(Hash.new(0)) do |word, words_count|
-      scrubbed_word = word.match(/[\w']+/).to_s
-      words_count[scrubbed_word] += 1 if scrubbed_word.length > 0
+    scrub_words(words).each_with_object(Hash.new(0)) do |word, words_count|
+      words_count[word] += 1
     end
+  end
+
+  private
+  def word_matcher
+    /[\w']+/
   end
 end
