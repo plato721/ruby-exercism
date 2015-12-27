@@ -9,7 +9,8 @@ class Board
   end
 
   def initialize(values)
-    validate(values)
+    destroy = values.dup
+    validate(destroy)
     @grid = populate_grid(values)
     add_mine_counts
   end
@@ -18,6 +19,29 @@ class Board
     if !row_lengths_same?(values)
       raise ValueError, "Not all row lengths are equal"
     end
+    if !borders_proper?(values)
+      raise ValueError, "Borders messed"
+    end
+  end
+
+  def borders_proper?(values)
+    check_top_and_bottom(values) &&
+    check_body(values)
+  end
+
+  def check_body(values)
+    values.shift
+    values.pop
+    values.each do |row|
+      return false if !(row =~ /\|[ \*]+\|/)
+    end
+    true
+  end
+
+  def check_top_and_bottom(values)
+    end_piece = /\+-+\+/
+    values.first =~ end_piece &&
+    values.last =~ end_piece
   end
 
   def row_lengths_same?(values)

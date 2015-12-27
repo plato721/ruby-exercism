@@ -73,7 +73,6 @@ class MinesweeperTest < Minitest::Test
   end
 
   def test_faulty_border
-    skip
     inp = ['+-----+', '*   * |', '+-- --+']
     assert_raises(ValueError) do
       Board.transform(inp)
@@ -81,7 +80,6 @@ class MinesweeperTest < Minitest::Test
   end
 
   def test_invalid_char
-    skip
     inp = ['+-----+', '|X  * |', '+-----+']
     assert_raises(ValueError) do
       Board.transform(inp)
