@@ -5,15 +5,6 @@ class Phrase
     @phrase = phrase
   end
 
-  def to_words(phrase)
-    phrase.downcase.split(/[ \n,]/)
-  end
-
-  def scrub_words(words)
-    words.select { |word| word =~ word_matcher }
-    .map { |word| word.match(word_matcher).to_s }
-  end
-
   def word_count
     words = to_words(self.phrase)
     scrub_words(words).each_with_object(Hash.new(0)) do |word, words_count|
@@ -22,7 +13,16 @@ class Phrase
   end
 
   private
-  def word_matcher
-    /[\w']+/
-  end
+    def to_words(phrase)
+      phrase.downcase.split(/[ \n,]/)
+    end
+
+    def scrub_words(words)
+      words.select { |word| word =~ word_matcher }
+      .map { |word| word.match(word_matcher).to_s }
+    end
+
+    def word_matcher
+      /[\w']+/
+    end
 end
