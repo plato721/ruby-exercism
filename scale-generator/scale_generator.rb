@@ -7,21 +7,22 @@ class Scale
     @intervals = intervals || "m" * 12
   end
 
-  def all_pitches_sharps
+  def sharps
     ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
   end
 
-  def all_pitches_flats
+  def flats
     ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
   end
 
+  def sharp_keys
+    ['C','C#','D','D#','E','F#','G','G#','A','A#','B']
+  end
+
   def sharps_or_flats
-    return :all_pitches_flats if type == :locrian || type == :harmonic_minor
-    if ['C','C#','D','D#','E','F#','G','G#','A','A#','B'].include?(self.tonic)
-      :all_pitches_sharps
-    else
-      :all_pitches_flats
-    end
+    return :flats if type == :locrian || type == :harmonic_minor
+    return :sharps if sharp_keys.include?(self.tonic)
+    :flats
   end
 
   def name
@@ -32,6 +33,27 @@ class Scale
     self.send(type)
   end
 
+  def permitted_scales
+    [:major, :minor, :harmonic_minor, :pentatonic, :mixolydian, :dorian,
+      :enigma, :hexatonic, :octatonic, :locrian, :phrygian, :lydian,
+      :chromatic]
+  end
+
+  def method_missing(m, *args)
+    super if !permitted_scales.include?(m)
+    self.scale
+  end
+
+  def scale
+    notes = sharps_or_flats
+    offset = self.send(notes).index(self.tonic)
+    [*0..(self.intervals.length - 1)].each_with_object([]) do |count, scale|
+      index = (note_index(count) + offset) % sharps.length
+      scale << self.send(notes)[index]
+    end
+  end
+
+  private
   def whole_steps(steps)
     steps.count("M") * 2
   end
@@ -48,18 +70,4 @@ class Scale
     steps = intervals.slice(0, count)
     whole_steps(steps) + half_steps(steps) + augmented(steps)
   end
-
-  def method_missing(m, *args)
-    self.scale
-  end
-
-  def scale
-    notes = sharps_or_flats
-    offset = self.send(notes).index(self.tonic)
-    [*0..(self.intervals.length - 1)].each_with_object([]) do |count, scale|
-      index = (note_index(count) + offset) % all_pitches_sharps.length
-      scale << self.send(notes)[index]
-    end
-  end
-
 end
