@@ -1,5 +1,5 @@
 class Scale
-  attr_reader :tonic, :type
+  attr_reader :tonic, :type, :intervals
 
   def initialize(tonic, type, intervals=nil)
     @tonic = tonic
@@ -27,14 +27,34 @@ class Scale
     end
   end
 
+  def whole_steps(steps)
+    steps.count("M") * 2
+  end
+
+  def half_steps(steps)
+    steps.count("m")
+  end
+
+  def note_index(count)
+    steps = intervals.slice(0, count)
+    whole_steps(steps) + half_steps(steps)
+  end
+
+  def major
+    notes = sharps_or_flats
+    offset = self.send(notes).index(self.tonic)
+    [*0..(self.intervals.length - 1)].each_with_object([]) do |count, scale|
+      index = (note_index(count) + offset) % all_pitches_sharps.length
+      scale << self.send(notes)[index]
+    end
+  end
+
   def chromatic
     offset = all_pitches_sharps.index(tonic)
-    # scale = []
     [*0..(all_pitches_sharps.length - 1)].each_with_object([]) do |count, scale|
       index = (count + offset) % all_pitches_sharps.length
       scale << self.send(sharps_or_flats)[index]
     end
-    # scale
   end
 
   def pitches
