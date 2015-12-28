@@ -7,6 +7,14 @@ class Scale
     @intervals = intervals || "m" * 12
   end
 
+  def notes
+    @notes ||= sharps_or_flats
+  end
+
+  def offset
+    @offset ||= self.send(notes).index(self.tonic)
+  end
+
   def sharps
     ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
   end
@@ -45,8 +53,6 @@ class Scale
   end
 
   def scale
-    notes = sharps_or_flats
-    offset = self.send(notes).index(self.tonic)
     [*0..(self.intervals.length - 1)].each_with_object([]) do |count, scale|
       index = (note_index(count) + offset) % sharps.length
       scale << self.send(notes)[index]
