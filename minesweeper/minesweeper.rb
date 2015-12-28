@@ -94,10 +94,7 @@ class BoardValidator
 
   def check_body(values)
     values = remove_top_and_bottom(values)
-    values.each do |row|
-      return false if !(row =~ /\|[ \*]+\|/)
-    end
-    true
+    values.all? { |row| row =~ /\|[ \*]+\|/ }
   end
 
   def remove_top_and_bottom(values)
