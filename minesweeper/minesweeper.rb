@@ -12,6 +12,10 @@ class Board
     add_mine_counts
   end
 
+  def condense
+    grid.map { |row| row.join }
+  end
+
   def populate_grid(values)
     values.map { |row| row.chars }
   end
@@ -19,16 +23,19 @@ class Board
   def add_mine_counts
     grid.length.times do |row|
       grid.first.length.times do |column|
-        if grid[row][column] == ' '
-          count = mines_for([row, column])
-          grid[row][column] = count if count > 0
-        end
+        process_mines(grid: grid, row: row, column: column)
       end
     end
   end
 
-  def condense
-    grid.map { |row| row.join }
+  def process_mines(args)
+    cell = args[:grid][args[:row]][args[:column]]
+    add_mine_count(args) if cell == ' '
+  end
+
+  def add_mine_count(args)
+    count = mines_for([args[:row], args[:column]])
+    args[:grid][args[:row]][args[:column]] = count if count > 0
   end
 
   def mines_for(coords)
