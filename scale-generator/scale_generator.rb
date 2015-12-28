@@ -8,11 +8,11 @@ class Scale
   end
 
   def notes
-    @notes ||= sharps_or_flats
+    @notes ||= self.send(sharps_or_flats)
   end
 
   def offset
-    @offset ||= self.send(notes).index(self.tonic)
+    @offset ||= self.notes.index(self.tonic)
   end
 
   def sharps
@@ -54,26 +54,33 @@ class Scale
 
   def scale
     [*0..(self.intervals.length - 1)].each_with_object([]) do |count, scale|
-      index = (note_index(count) + offset) % sharps.length
-      scale << self.send(notes)[index]
+      scale << next_note(count)
     end
   end
 
   private
-  def whole_steps(steps)
+  def convert_whole(steps)
     steps.count("M") * 2
   end
 
-  def half_steps(steps)
+  def convert_half(steps)
     steps.count("m")
   end
 
-  def augmented(steps)
+  def convert_augmented(steps)
     steps.count("A") * 3
   end
 
-  def note_index(count)
+  def relative_index(count)
     steps = intervals.slice(0, count)
-    whole_steps(steps) + half_steps(steps) + augmented(steps)
+    convert_whole(steps) + convert_half(steps) + convert_augmented(steps)
+  end
+
+  def absolute_index(count)
+    (relative_index(count) + self.offset) % sharps.length
+  end
+
+  def next_note(count)
+    self.notes[absolute_index(count)]
   end
 end
