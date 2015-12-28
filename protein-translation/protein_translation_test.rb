@@ -11,7 +11,6 @@ class TranslationTest < Minitest::Test
   end
 
   def test_identifies_Phenylalanine_codons
-    skip
     assert_equal 'Phenylalanine', Translation.of_codon('UUU')
     assert_equal 'Phenylalanine', Translation.of_codon('UUC')
   end
