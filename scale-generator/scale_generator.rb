@@ -2,7 +2,7 @@ class Scale
   attr_reader :tonic, :type, :intervals
 
   def initialize(tonic, type, intervals=nil)
-    @tonic = tonic
+    @tonic = tonic.capitalize
     @type = type
     @intervals = intervals
   end
@@ -38,6 +38,10 @@ class Scale
   def note_index(count)
     steps = intervals.slice(0, count)
     whole_steps(steps) + half_steps(steps)
+  end
+
+  def minor
+    self.major
   end
 
   def major
