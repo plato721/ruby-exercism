@@ -2,9 +2,6 @@ class Board
   attr_accessor :grid
 
   def self.transform(values)
-    # ["+------+", "|1*22*1|", "|12*322|",
-      # "| 123*2|", "|112*4*|", "|1*22*2|", "|111111|", "+------+"]
-      # require 'pry';binding.pry
     new(values).condense
   end
 
