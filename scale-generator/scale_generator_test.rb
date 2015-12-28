@@ -104,7 +104,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_octatonic
-    skip
     octatonic = Scale.new('C', :octatonic, 'MmMmMmMm')
     expected = ['C', 'D', 'D#', 'F', 'F#', 'G#', 'A', 'B']
     actual = octatonic.pitches
@@ -112,7 +111,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_hexatonic
-    skip
     hexatonic = Scale.new('Db', :hexatonic, 'MMMMMM')
     expected = %w(Db Eb F G A B)
     actual = hexatonic.pitches
@@ -120,7 +118,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_pentatonic
-    skip
     pentatonic = Scale.new('A', :pentatonic, 'MMAMA')
     expected = ['A', 'B', 'C#', 'E', 'F#']
     actual = pentatonic.pitches
@@ -128,7 +125,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_enigmatic
-    skip
     enigmatic = Scale.new('G', :enigma, 'mAMMMmM')
     expected = ['G', 'G#', 'B', 'C#', 'D#', 'F', 'F#']
     actual = enigmatic.pitches
