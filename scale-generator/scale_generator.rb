@@ -3,8 +3,8 @@ class Scale
 
   def initialize(tonic, type, intervals=nil)
     @tonic = tonic.capitalize
-    @type = type
-    @intervals = intervals
+    @type = type.to_sym
+    @intervals = intervals || "m" * 12
   end
 
   def all_pitches_sharps
@@ -15,16 +15,21 @@ class Scale
     ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
   end
 
-  def name
-    self.tonic.capitalize + " " + self.type.to_s
-  end
-
   def sharps_or_flats
+    return :all_pitches_flats if type == :locrian || type == :harmonic_minor
     if ['C','C#','D','D#','E','F#','G','G#','A','A#','B'].include?(self.tonic)
       :all_pitches_sharps
     else
       :all_pitches_flats
     end
+  end
+
+  def name
+    self.tonic.capitalize + " " + self.type.to_s
+  end
+
+  def pitches
+    self.send(type)
   end
 
   def whole_steps(steps)
@@ -35,16 +40,20 @@ class Scale
     steps.count("m")
   end
 
+  def augmented(steps)
+    steps.count("A") * 3
+  end
+
   def note_index(count)
     steps = intervals.slice(0, count)
-    whole_steps(steps) + half_steps(steps)
+    whole_steps(steps) + half_steps(steps) + augmented(steps)
   end
 
-  def minor
-    self.major
+  def method_missing(m, *args)
+    self.scale
   end
 
-  def major
+  def scale
     notes = sharps_or_flats
     offset = self.send(notes).index(self.tonic)
     [*0..(self.intervals.length - 1)].each_with_object([]) do |count, scale|
@@ -52,18 +61,5 @@ class Scale
       scale << self.send(notes)[index]
     end
   end
-
-  def chromatic
-    offset = all_pitches_sharps.index(tonic)
-    [*0..(all_pitches_sharps.length - 1)].each_with_object([]) do |count, scale|
-      index = (count + offset) % all_pitches_sharps.length
-      scale << self.send(sharps_or_flats)[index]
-    end
-  end
-
-  def pitches
-    self.send(type)
-  end
-
 
 end

@@ -55,7 +55,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_another_minor_scale
-    skip
     minor = Scale.new('bb', :minor, 'MmMMmMM')
     expected = %w(Bb C Db Eb F Gb Ab)
     actual = minor.pitches
@@ -63,7 +62,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_dorian_mode
-    skip
     dorian = Scale.new('d', :dorian, 'MmMMMmM')
     expected = %w(D E F G A B C)
     actual = dorian.pitches
@@ -71,7 +69,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_mixolydian_mode
-    skip
     mixolydian = Scale.new('Eb', :mixolydian, 'MMmMMmM')
     expected = %w(Eb F G Ab Bb C Db)
     actual = mixolydian.pitches
@@ -79,7 +76,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_lydian_mode
-    skip
     lydian = Scale.new('a', :lydian, 'MMMmMMm')
     expected = ['A', 'B', 'C#', 'D#', 'E', 'F#', 'G#']
     actual = lydian.pitches
@@ -87,7 +83,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_phrygian_mode
-    skip
     phrygian = Scale.new('e', :phrygian, 'mMMMmMM')
     expected = %w(E F G A B C D)
     actual = phrygian.pitches
@@ -95,7 +90,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_locrian_mode
-    skip
     locrian = Scale.new('g', :locrian, 'mMMmMMM')
     expected = %w(G Ab Bb C Db Eb F)
     actual = locrian.pitches
@@ -103,7 +97,6 @@ class ScaleGeneratorTest < Minitest::Test
   end
 
   def test_harmonic_minor
-    skip
     harmonic_minor = Scale.new('d', 'harmonic_minor', 'MmMMmAm')
     expected = %w(D E F G A Bb Db)
     actual = harmonic_minor.pitches
