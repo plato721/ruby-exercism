@@ -38,21 +38,6 @@ class Scale
   end
 
   def pitches
-    self.send(type)
-  end
-
-  def permitted_scales
-    [:major, :minor, :harmonic_minor, :pentatonic, :mixolydian, :dorian,
-      :enigma, :hexatonic, :octatonic, :locrian, :phrygian, :lydian,
-      :chromatic]
-  end
-
-  def method_missing(m, *args)
-    super if !permitted_scales.include?(m)
-    self.scale
-  end
-
-  def scale
     [*0..(self.intervals.length - 1)].each_with_object([]) do |count, scale|
       scale << next_note(count)
     end
