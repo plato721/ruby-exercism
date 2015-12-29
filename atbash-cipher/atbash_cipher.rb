@@ -15,11 +15,9 @@ class Atbash
   end
 
   def self.enspace(msg)
-    spaced = []
-    msg.chars.each_slice(5) do |slice|
+    msg.chars.each_slice(5).with_object([]) do |slice, spaced|
       spaced << slice.push(" ")
-    end
-    spaced.flatten.join.chop
+    end.flatten.join.chop
   end
 
   def self.sanitize(msg)
