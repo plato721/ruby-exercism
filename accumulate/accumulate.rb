@@ -1,9 +1,7 @@
 class Array
   def accumulate
-    acc = []
-    self.length.times do |idx|
-      acc << yield(self[idx])
+    [*0...length].each_with_object([]) do |index, collection|
+      collection << yield(self[index])
     end
-    acc
   end
 end
