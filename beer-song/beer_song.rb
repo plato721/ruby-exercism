@@ -1,17 +1,10 @@
 class BeerSong
   def verse(verse_num)
-    case
-    when verse_num > 2
-      verse_typical(verse_num)
-    when verse_num == 2
-      verse_two
-    when verse_num == 1
-      verse_one
-    when verse_num == 0
-      verse_zero
-    else
-      raise ArgumentError, "Bad verse number"
-    end
+    return verse_typical(verse_num) if verse_num > 2
+    return verse_two if verse_num == 2
+    return verse_one if verse_num == 1
+    return verse_zero if verse_num == 0
+    raise ArgumentError, "Bad verse number"
   end
 
   def verses(verse_high, verse_low)
