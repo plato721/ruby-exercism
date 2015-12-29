@@ -1,22 +1,19 @@
 class Translation
   def self.of_codon(protein)
-    check_codon(protein)
+    validate_codon(protein)
     codon_map.each do |codons, amino_acid|
       return amino_acid if codons.include?(protein)
     end
   end
 
-  def self.check_codon(protein)
+  def self.validate_codon(protein)
     if !(codon_map.keys.flatten.include?(protein))
       raise InvalidCodonError, "Invalid codon."
     end
   end
 
   def self.lowest_stop(proteins)
-    proteins.each_with_index do |protein, index|
-      return index if protein.stop?
-    end
-    nil
+    proteins.find_index { |protein| protein.stop? }
   end
 
   def self.to_proteins(strand)
