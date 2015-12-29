@@ -1,11 +1,13 @@
 class Translation
   def self.of_codon(protein)
     check_codon(protein)
-    codon_map[protein]
+    codon_map.each do |codons, amino_acid|
+      return amino_acid if codons.include?(protein)
+    end
   end
 
   def self.check_codon(protein)
-    if !(codon_map.keys.include?(protein))
+    if !(codon_map.keys.flatten.include?(protein))
       raise InvalidCodonError, "Invalid codon."
     end
   end
@@ -35,23 +37,14 @@ class Translation
   end
 
   def self.codon_map
-    {'AUG' => 'Methionine',
-     'UUU' => 'Phenylalanine',
-     'UUC' => 'Phenylalanine',
-     'UUA' => 'Leucine',
-     'UUG' => 'Leucine',
-     'UCU' => 'Serine',
-     'UCC' => 'Serine',
-     'UCA' => 'Serine',
-     'UCG' => 'Serine',
-     'UAU' => 'Tyrosine',
-     'UAC' => 'Tyrosine',
-     'UGU' => 'Cysteine',
-     'UGC' => 'Cysteine',
-     'UGG' => 'Tryptophan',
-     'UAA' => 'STOP',
-     'UAG' => 'STOP',
-     'UGA' => 'STOP' }
+    {['AUG'] => 'Methionine',
+     ['UUU', 'UUC'] => 'Phenylalanine',
+     ['UUA', 'UUG'] => 'Leucine',
+     ['UCU', 'UCC', 'UCA', 'UCG'] => 'Serine',
+     ['UAU', 'UAC'] => 'Tyrosine',
+     ['UGU', 'UGC'] => 'Cysteine',
+     ['UGG'] => 'Tryptophan',
+     ['UAA', 'UAG', 'UGA'] => 'STOP'}
   end
 end
 
