@@ -9,37 +9,23 @@ module Complement
 
   RNA_DNA = DNA_RNA.invert
 
-  def self.dna_rna_map(nucleotide)
-    validate_dna(nucleotide)
-    DNA_RNA[nucleotide]
+  def self.invalid_rna(nucleotide)
+    raise ArgumentError, "#{nucleotide} is not a valid RNA nucleotide"
   end
 
-  def self.rna_dna_map(nucleotide)
-    validate_rna(nucleotide)
-    RNA_DNA[nucleotide]
-  end
-
-  def self.validate_rna(nucleotide)
-    if RNA_DNA[nucleotide].nil?
-      raise ArgumentError, "Invalid RNA nucleotide"
-    end
-  end
-
-  def self.validate_dna(nucleotide)
-    if DNA_RNA[nucleotide].nil?
-      raise ArgumentError, "Invalid DNA nucleotide"
-    end
+  def self.invalid_dna(nucleotide)
+    raise ArgumentError, "#{nucleotide} is not a valid DNA nucleotide"
   end
 
   def self.of_dna(dna)
     dna.chars.map do |char|
-      dna_rna_map(char)
+      DNA_RNA.fetch(char) { |nucleotide| invalid_dna }
     end.join
   end
 
   def self.of_rna(rna)
     rna.chars.map do |char|
-      rna_dna_map(char)
+      RNA_DNA.fetch(char) { |nucleotide| invalid_rna }
     end.join
   end
 end
