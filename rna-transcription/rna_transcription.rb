@@ -11,12 +11,12 @@ module Complement
 
   def self.dna_rna_map(nucleotide)
     raise ArgumentError if DNA_RNA[nucleotide].nil?
-    DNA_RNA[nucleotide].to_s
+    DNA_RNA[nucleotide]
   end
 
   def self.rna_dna_map(nucleotide)
     raise ArgumentError if RNA_DNA[nucleotide].nil?
-    RNA_DNA[nucleotide].to_s
+    RNA_DNA[nucleotide]
   end
 
   def self.of_dna(dna)
