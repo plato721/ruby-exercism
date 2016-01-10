@@ -1,19 +1,13 @@
 class Translation
   def self.of_codon(protein)
-    validate_codon(protein)
-    codon_map.each do |codons, amino_acid|
-      return amino_acid if codons.include?(protein)
+    codons_amino = codon_map.find do |codons, amino_acid|
+      codons.include?(protein)
     end
+    codons_amino ? codons_amino.last : invalid_codon
   end
 
-  def self.validate_codon(protein)
-    if !(codon_map.keys.flatten.include?(protein))
-      raise InvalidCodonError, "Invalid codon."
-    end
-  end
-
-  def self.lowest_stop(proteins)
-    proteins.find_index { |protein| protein.stop? }
+  def self.invalid_codon
+    raise InvalidCodonError, "Invalid codon."
   end
 
   def self.to_proteins(strand)
@@ -22,14 +16,8 @@ class Translation
     end
   end
 
-  def self.apply_stop(proteins)
-    stop_idx = lowest_stop(proteins)
-    stop_idx ? proteins.slice(0, stop_idx) : proteins
-  end
-
   def self.of_rna(strand)
-    proteins = to_proteins(strand)
-    proteins = apply_stop(proteins)
+    proteins = to_proteins(strand).take_while { |codon| !codon.stop? }
     proteins.map(&:amino_acid)
   end
 
