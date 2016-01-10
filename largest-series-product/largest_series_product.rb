@@ -18,11 +18,9 @@ class Series
 
   def largest_product(length)
     validate_slice(length)
-    max = 1
-    sequence.each_with_index do |num, idx|
-      cur = sequence.slice(idx...(idx + length)).inject(:*)
-      max = cur if cur > max
-    end
-    max
+    return 1 if self.sequence.empty?
+    sequence.each_cons(length).with_object([]) do |slice, products|
+      products << slice.inject(:*)
+    end.max
   end
 end
