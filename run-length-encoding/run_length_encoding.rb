@@ -7,11 +7,7 @@ class RunLengthEncoding
     until word.empty?
       char = word[0]
       count = count_leading_character(word)
-      if count == 1
-        result += char
-      else
-        result += ( count.to_s + char )
-      end
+      count == 1 ? result += char : result += ( count.to_s + char )
       count.times{ word.shift }
     end
     result
@@ -22,40 +18,22 @@ class RunLengthEncoding
     word = word.clone
     count = 0
     loop do
-      if word[0] == char
-        count += 1
-      else
-        break
-      end
+      word[0] == char ? count += 1 : break
       word.shift
     end
     count
   end
 
-  def self.is_num?(char)
-    char.to_i.to_s == char
-  end
-
-  def self.leading_number(word)
-    result = ""
-    word = word.chars
-    loop do
-      break if !is_num?(word[0])
-      result += word.shift
-    end
-    result.empty? ? "1" : result
+  def self.decode_single(code)
+    matcher = code.match(/[\d]+/)
+    return code if !matcher
+    matcher.post_match * matcher[0].to_i
   end
 
   def self.decode(word)
-    result = ""
-    until word.empty?
-      leader = leading_number(word)
-      count  = leader.to_i
-      word.slice!(0, leader.length) unless count == 1
-      current = word.slice!(0, 1)
-      result += (current * count)
-    end
-    result
+    word.scan(/[\d]*[\D]{1}/)
+        .map { |code| decode_single(code) }
+        .join
   end
 end
 
