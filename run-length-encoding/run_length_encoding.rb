@@ -1,15 +1,12 @@
 class RunLengthEncoding
-  require 'pry'
-
   def self.encode(word)
-    result = ""
-    until word.empty?
-      char = word[0]
-      count = count_leading_character(word)
-      count == 1 ? result += char : result += ( count.to_s + char )
-      word.slice!(0,count)
-    end
-    result
+    return "" if word.empty?
+
+    count = count_leading_character(word)
+    result = count == 1 ? word[0] : "#{count}#{word[0]}"
+    remainder = word.slice(count, word.size)
+
+    result + encode(remainder)
   end
 
   def self.count_leading_character(word)
