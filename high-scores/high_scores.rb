@@ -14,7 +14,7 @@ class HighScores
   end
 
   def personal_top
-    scores.sort { |x, y| y <=> x }.take(3)
+    scores.max(3)
   end
 
   def latest_best?
