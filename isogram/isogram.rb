@@ -1,15 +1,18 @@
 class Isogram
   class << self
     def isogram?(word)
-      word.split('').each_with_index do |character, index|
-        next if allowed_to_duplicate?(character)
-
-        rest = word[(index + 1)..-1]
-        return false if rest.downcase.include?(character.downcase)
+      word.split('').all? do |letter|
+        appears_exactly_once?(letter, word) || is_repeatable?(letter)
       end
     end
 
-    def allowed_to_duplicate?(character)
+    def appears_exactly_once?(letter, word)
+      word.split('').count do |c|
+        c.downcase == letter.downcase
+      end == 1
+    end
+
+    def is_repeatable?(character)
       character.match(/[- ]/)
     end
   end
