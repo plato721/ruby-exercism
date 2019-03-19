@@ -4,7 +4,7 @@
 class Isogram
   class << self
     def isogram?(word)
-      normalized = word.scan(/[^- ]/)
+      normalized = word.scan(/[\w]/)
       normalized.uniq(&:downcase).length == normalized.length
     end
   end
