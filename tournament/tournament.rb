@@ -10,7 +10,7 @@ class Tournament
 
     def tally_results(grouped_results)
       grouped_results.map do |team, results|
-        ResultTally.from_results(team, results)
+        ResultsTally.from_results(team, results)
       end
     end
 
@@ -28,7 +28,7 @@ class Tournament
   end
 end
 
-class ResultTally
+class ResultsTally
   class << self
     def from_results(team_name, results)
       wins = count_wins(results)
