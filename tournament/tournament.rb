@@ -83,28 +83,21 @@ end
 class Result
   class << self
     def from_raw(raw)
-      [first_result(raw), second_result(raw)]
+      [result(raw, 0), result(raw, 1)]
     end
 
     private
-    def first_result(raw)
+    def result(raw, position)
       raw_array = raw.split(';')
-      team = raw_array.first
-      result = raw_array.last
-      new(team, result)
-    end
-
-    def second_result(raw)
-      raw_array = raw.split(';')
-      team = raw_array[1]
-      result = flip_result(raw_array.last)
+      team = raw_array[position]
+      result = position.zero? ? raw_array.last : flip_result(raw_array.last)
       new(team, result)
     end
 
     def flip_result(result)
-      return 'loss' if result == 'win'
-      return 'win' if result == 'loss'
-      result
+      return result if result == 'draw'
+
+      result == 'win' ? 'loss' : 'win'
     end
   end
 
