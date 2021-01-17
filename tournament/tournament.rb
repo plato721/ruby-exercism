@@ -1,12 +1,12 @@
 class Tournament
-  def self.tally(game_results)
-    tournament = new(game_results)
+  def self.tally(raw_results)
+    tournament = new(raw_results)
     tournament.execute
   end
 
-  def initialize(game_results)
+  def initialize(raw_results)
     @team_tallies = []
-    @game_results = game_results
+    @raw_results = raw_results
   end
 
   def execute
@@ -18,7 +18,7 @@ class Tournament
   private
 
   def compute_results
-    @game_results.split("\n").each { |row| calculate_team_tallies(row) }
+    @raw_results.split("\n").each { |row| calculate_team_tallies(row) }
   end
 
   def calculate_team_tallies(row)
@@ -53,20 +53,15 @@ class Tournament
   end
 
   def print_results
-    return print_headers + "\n" if @team_tallies.empty?
-    [print_headers, print_team_tallies].join("\n") + "\n"
+    "#{[headers, *@team_tallies].map(&:to_s).join("\n")}\n"
   end
 
   def sort_results
     @team_tallies.sort_by! { |tally| [-tally.points, tally.team] }
   end
 
-  def print_headers
+  def headers
     "Team                           | MP |  W |  D |  L |  P"
-  end
-
-  def print_team_tallies
-    @team_tallies.map(&:to_s).join("\n")
   end
 end
 
