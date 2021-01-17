@@ -10,12 +10,16 @@ class Tournament
   end
 
   def execute
-    @game_results.split("\n").each { |row| calculate_team_tallies(row) }
+    compute_results
     sort_results
     print_results
   end
 
   private
+
+  def compute_results
+    @game_results.split("\n").each { |row| calculate_team_tallies(row) }
+  end
 
   def calculate_team_tallies(row)
     team_a, team_b, result = row.split(';')
