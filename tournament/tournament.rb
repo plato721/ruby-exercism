@@ -53,20 +53,20 @@ class Tournament
   end
 
   def print_results
-    return headers + "\n" if @team_tallies.empty?
-    [headers, print_team_tallies].join("\n") + "\n"
+    return print_headers + "\n" if @team_tallies.empty?
+    [print_headers, print_team_tallies].join("\n") + "\n"
   end
 
   def sort_results
     @team_tallies.sort_by! { |tally| [-tally.points, tally.team] }
   end
 
-  def headers
+  def print_headers
     "Team                           | MP |  W |  D |  L |  P"
   end
 
   def print_team_tallies
-    @team_tallies.map { |tally| tally.to_s }.join("\n")
+    @team_tallies.map(&:to_s).join("\n")
   end
 end
 
