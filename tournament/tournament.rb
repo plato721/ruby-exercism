@@ -27,51 +27,29 @@ class Tournament
     calculate_team_tally(team_b, flip_result(result))
   end
 
+  def calculate_team_tally(team, result)
+    current_tally = find_or_create_tally(team)
+    current_tally.update_for(result)
+  end
+
   def flip_result(result)
     return result if result == 'draw'
 
     result == 'win' ? 'loss' : 'win'
   end
 
-  def calculate_team_tally(team, result)
-    current_tally = find_or_create_tally(team)
-    current_tally[:matches_played] += 1
-    send("update_for_#{result}".to_sym, current_tally)
-  end
-
-  def update_for_win(current_tally)
-    current_tally[:wins] += 1
-    current_tally[:points] += 3
-  end
-
-  def update_for_loss(current_tally)
-    current_tally[:losses] += 1
-  end
-
-  def update_for_draw(current_tally)
-    current_tally[:draws] += 1
-    current_tally[:points] += 1
-  end
-
   def find_or_create_tally(team)
-    tally = @team_tallies.find { |tally| tally[:team] == team }
-    return tally if tally
+    find_tally(team) || create_new_tally(team)
+  end
 
-    new_tally = base_team_tally.clone
-    new_tally[:team] = team
+  def find_tally(team)
+    @team_tallies.find { |tally| tally.team == team }
+  end
+
+  def create_new_tally(team)
+    new_tally = TeamTally.new(team)
     @team_tallies << new_tally
     new_tally
-  end
-
-  def base_team_tally
-    {
-      team: nil,
-      matches_played: 0,
-      wins: 0,
-      draws: 0,
-      losses: 0,
-      points: 0
-    }
   end
 
   def print_results
@@ -80,7 +58,7 @@ class Tournament
   end
 
   def sort_results
-    @team_tallies.sort_by! { |tally| [-tally[:points], tally[:team]] }
+    @team_tallies.sort_by! { |tally| [-tally.points, tally.team] }
   end
 
   def headers
@@ -88,10 +66,44 @@ class Tournament
   end
 
   def print_team_tallies
-    @team_tallies.map { |tally| print_tally(tally) }.join("\n")
+    @team_tallies.map { |tally| tally.to_s }.join("\n")
+  end
+end
+
+class TeamTally
+  attr_reader :team, :points, :matches_played, :wins, :losses, :draws
+
+  def initialize(team)
+    @team = team
+    @matches_played = 0
+    @wins = 0
+    @losses = 0
+    @draws = 0
+    @points = 0
   end
 
-  def print_tally(tally)
-    "#{tally[:team].ljust(31, ' ')}|  #{tally[:matches_played]} |  #{tally[:wins]} |  #{tally[:draws]} |  #{tally[:losses]} |  #{tally[:points]}"
+  def update_for(result)
+    @matches_played += 1
+    send("update_for_#{result}".to_sym)
+  end
+
+  def to_s
+    "#{team.ljust(31, ' ')}|  #{matches_played} |  #{wins} |  #{draws} |  #{losses} |  #{points}"
+  end
+
+  private
+
+  def update_for_win
+    @wins += 1
+    @points += 3
+  end
+
+  def update_for_loss
+    @losses += 1
+  end
+
+  def update_for_draw
+    @draws += 1
+    @points += 1
   end
 end
