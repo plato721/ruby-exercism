@@ -27,21 +27,33 @@ class Tournament
     calculate_team_tally(team_b, flip_result(result))
   end
 
-  def calculate_team_tally(team, result)
-    current_tally = get_tally(team)
-    current_tally[:matches_played] += 1
-    if result == "win"
-      current_tally[:wins] += 1
-      current_tally[:points] += 3
-    elsif result == "loss"
-      current_tally[:losses] += 1
-    elsif result == "draw"
-      current_tally[:draws] += 1
-      current_tally[:points] += 1
-    end
+  def flip_result(result)
+    return result if result == 'draw'
+
+    result == 'win' ? 'loss' : 'win'
   end
 
-  def get_tally(team)
+  def calculate_team_tally(team, result)
+    current_tally = find_or_create_tally(team)
+    current_tally[:matches_played] += 1
+    send("update_for_#{result}".to_sym, current_tally)
+  end
+
+  def update_for_win(current_tally)
+    current_tally[:wins] += 1
+    current_tally[:points] += 3
+  end
+
+  def update_for_loss(current_tally)
+    current_tally[:losses] += 1
+  end
+
+  def update_for_draw(current_tally)
+    current_tally[:draws] += 1
+    current_tally[:points] += 1
+  end
+
+  def find_or_create_tally(team)
     tally = @team_tallies.find { |tally| tally[:team] == team }
     return tally if tally
 
@@ -49,12 +61,6 @@ class Tournament
     new_tally[:team] = team
     @team_tallies << new_tally
     new_tally
-  end
-
-  def flip_result(result)
-    return result if result == 'draw'
-
-    result == 'win' ? 'loss' : 'win'
   end
 
   def base_team_tally
