@@ -1,125 +1,113 @@
 class Tournament
-  class << self
-    def tally(game_results)
-      results = game_results.split("\n").flat_map { |raw| Result.from_raw(raw) }
-      grouped_results = results.group_by { |result| result.team }
-      tallied_results = tally_results(grouped_results)
-      ordered_results = sort_results(tallied_results)
-      print_results(ordered_results)
-    end
-
-    def tally_results(grouped_results)
-      grouped_results.map do |team, results|
-        ResultsTally.from_results(team, results)
-      end
-    end
-
-    def print_results(tallies)
-      tallies.map(&:to_s).unshift(headers).join("\n") + "\n"
-    end
-
-    def sort_results(tallies)
-      tallies.sort_by { |tally| [-tally.points, tally.team_name] }
-    end
-
-    def headers
-      "Team                           | MP |  W |  D |  L |  P"
-    end
-  end
-end
-
-class ResultsTally
-  class << self
-    def from_results(team_name, results)
-      wins = count_wins(results)
-      draws = count_draws(results)
-      losses = count_losses(results)
-      new(team_name, wins, draws, losses)
-    end
-
-    def count_wins(results)
-      results.count { |result| result.win? }
-    end
-
-    def count_losses(results)
-      results.count { |result| result.loss? }
-    end
-
-    def count_draws(results)
-      results.count { |result| result.draw? }
-    end
+  def self.tally(raw_results)
+    tournament = new(raw_results)
+    tournament.execute
   end
 
-  attr_reader :team_name, :wins, :draws, :losses
-
-  def initialize(team_name, wins, draws, losses)
-    @team_name = team_name
-    @wins = wins
-    @draws = draws
-    @losses = losses
+  def initialize(raw_results)
+    @team_tallies = []
+    @raw_results = raw_results
   end
 
-  POINT_MAP = {
-    win: 3,
-    draw: 1,
-    loss: 0
-  }
-
-  def points
-    wins * POINT_MAP[:win] +
-    draws * POINT_MAP[:draw] +
-    losses * POINT_MAP[:loss]
-  end
-
-  def matches_played
-    wins + losses + draws
-  end
-
-  def to_s
-    "#{team_name.ljust(31, ' ')}|  #{matches_played} |  #{wins} |  #{draws} |  #{losses} |  #{points}"
-  end
-end
-
-class Result
-  class << self
-    def from_raw(raw)
-      [result(raw, 0), result(raw, 1)]
-    end
-
-    private
-    def result(raw, position)
-      raw_array = raw.split(';')
-      team = raw_array[position]
-      result = position.zero? ? raw_array.last : flip_result(raw_array.last)
-      new(team, result)
-    end
-
-    def flip_result(result)
-      return result if result == 'draw'
-
-      result == 'win' ? 'loss' : 'win'
-    end
-  end
-
-  attr_reader :team
-
-  def initialize(team, result)
-    @team = team
-    @result = result
-  end
-
-  def win?
-    result == "win"
-  end
-
-  def loss?
-    result == "loss"
-  end
-
-  def draw?
-    result == "draw"
+  def execute
+    compute_results
+    sort_results
+    print_results
   end
 
   private
-  attr_reader :result
+
+  def compute_results
+    @raw_results.split("\n").each { |row| calculate_team_tallies(row) }
+  end
+
+  def sort_results
+    @team_tallies.sort!
+  end
+
+  def print_results
+    "#{[headers, *@team_tallies].map(&:to_s).join("\n")}\n"
+  end
+
+  def calculate_team_tallies(row)
+    team_a, team_b, result = row.split(';')
+    calculate_team_tally(team_a, result)
+    calculate_team_tally(team_b, flip_result(result))
+  end
+
+  def calculate_team_tally(team, result)
+    current_tally = find_or_create_tally(team)
+    current_tally.update_for(result)
+  end
+
+  def flip_result(result)
+    return result if result == 'draw'
+
+    result == 'win' ? 'loss' : 'win'
+  end
+
+  def find_or_create_tally(team)
+    find_tally(team) || create_new_tally(team)
+  end
+
+  def find_tally(team)
+    @team_tallies.find { |tally| tally.team == team }
+  end
+
+  def create_new_tally(team)
+    new_tally = TeamTally.new(team)
+    @team_tallies << new_tally
+    new_tally
+  end
+
+  def headers
+    "Team                           | MP |  W |  D |  L |  P"
+  end
+end
+
+class TeamTally
+  attr_reader :team, :points, :matches_played, :wins, :losses, :draws
+
+  WIN_POINTS = 3
+  LOSS_POINTS = 0
+  DRAW_POINTS = 1
+
+  def initialize(team)
+    @team = team
+    @matches_played = 0
+    @wins = 0
+    @losses = 0
+    @draws = 0
+    @points = 0
+  end
+
+  def update_for(result)
+    @matches_played += 1
+    send("update_for_#{result}".to_sym)
+  end
+
+  def to_s
+    "#{team.ljust(31, ' ')}|  #{matches_played} |  #{wins} |  #{draws} |  #{losses} |  #{points}"
+  end
+
+  def <=>(other)
+    [-points, team] <=> [-other.points, other.team]
+  end
+
+  private
+
+  def update_for_win
+    @wins += 1
+    @points += WIN_POINTS
+  end
+
+  def update_for_loss
+    @losses += 1
+    @points += LOSS_POINTS
+  end
+
+  def update_for_draw
+    @draws += 1
+    @points += DRAW_POINTS
+  end
 end
