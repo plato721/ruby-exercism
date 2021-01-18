@@ -21,6 +21,14 @@ class Tournament
     @raw_results.split("\n").each { |row| calculate_team_tallies(row) }
   end
 
+  def sort_results
+    @team_tallies.sort_by! { |tally| [-tally.points, tally.team] }
+  end
+
+  def print_results
+    "#{[headers, *@team_tallies].map(&:to_s).join("\n")}\n"
+  end
+
   def calculate_team_tallies(row)
     team_a, team_b, result = row.split(';')
     calculate_team_tally(team_a, result)
@@ -52,14 +60,6 @@ class Tournament
     new_tally
   end
 
-  def print_results
-    "#{[headers, *@team_tallies].map(&:to_s).join("\n")}\n"
-  end
-
-  def sort_results
-    @team_tallies.sort_by! { |tally| [-tally.points, tally.team] }
-  end
-
   def headers
     "Team                           | MP |  W |  D |  L |  P"
   end
@@ -67,6 +67,10 @@ end
 
 class TeamTally
   attr_reader :team, :points, :matches_played, :wins, :losses, :draws
+
+  WIN_POINTS = 3
+  LOSS_POINTS = 0
+  DRAW_POINTS = 1
 
   def initialize(team)
     @team = team
@@ -90,15 +94,16 @@ class TeamTally
 
   def update_for_win
     @wins += 1
-    @points += 3
+    @points += WIN_POINTS
   end
 
   def update_for_loss
     @losses += 1
+    @points += LOSS_POINTS
   end
 
   def update_for_draw
     @draws += 1
-    @points += 1
+    @points += DRAW_POINTS
   end
 end
