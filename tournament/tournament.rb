@@ -55,9 +55,7 @@ class Tournament
   end
 
   def create_new_tally(team)
-    new_tally = TeamTally.new(team)
-    @team_tallies << new_tally
-    new_tally
+    TeamTally.new(team).tap { |tally| @team_tallies << tally }
   end
 
   def headers
