@@ -1,42 +1,42 @@
 class Tournament
   def self.tally(raw_results)
     tournament = new(raw_results)
-    tournament.execute
+    tournament.call
   end
 
   def initialize(raw_results)
-    @team_tallies = []
     @raw_results = raw_results
   end
 
-  def execute
-    compute_results
-    sort_results
-    print_results
+  def call
+    format sort calculate @raw_results
   end
 
   private
 
-  def compute_results
-    @raw_results.split("\n").each { |row| calculate_team_tallies(row) }
+  def calculate(raw_results)
+    raw_results.split("\n").inject([]) do |tallies, row|
+      calculate_team_tallies(tallies, row)
+    end
   end
 
-  def sort_results
-    @team_tallies.sort!
+  def sort(tallies)
+    tallies.sort!
   end
 
-  def print_results
-    "#{[headers, *@team_tallies].map(&:to_s).join("\n")}\n"
+  def format(tallies)
+    "#{[headers, *tallies].map(&:to_s).join("\n")}\n"
   end
 
-  def calculate_team_tallies(row)
+  def calculate_team_tallies(tallies, row)
     team_a, team_b, result = row.split(';')
-    calculate_team_tally(team_a, result)
-    calculate_team_tally(team_b, flip_result(result))
+    calculate_team_tally(tallies, team_a, result)
+    calculate_team_tally(tallies, team_b, flip_result(result))
+    tallies
   end
 
-  def calculate_team_tally(team, result)
-    current_tally = find_or_create_tally(team)
+  def calculate_team_tally(tallies, team, result)
+    current_tally = find_or_create_tally(tallies, team)
     current_tally.update_for(result)
   end
 
@@ -46,18 +46,16 @@ class Tournament
     result == 'win' ? 'loss' : 'win'
   end
 
-  def find_or_create_tally(team)
-    find_tally(team) || create_new_tally(team)
+  def find_or_create_tally(tallies, team)
+    find_tally(tallies, team) || create_new_tally(tallies, team)
   end
 
-  def find_tally(team)
-    @team_tallies.find { |tally| tally.team == team }
+  def find_tally(tallies, team)
+    tallies.find { |tally| tally.team == team }
   end
 
-  def create_new_tally(team)
-    new_tally = TeamTally.new(team)
-    @team_tallies << new_tally
-    new_tally
+  def create_new_tally(tallies, team)
+    TeamTally.new(team).tap { |tally| tallies << tally }
   end
 
   def headers
