@@ -6,29 +6,48 @@ class Brackets
   }
 
   def self.paired?(string)
-    stack = []
-    string.split("").each do |char|
-      next if !is_bracket?(char)
-
+    string.split("").inject(SimpleStack.new) do |stack, char|
       if is_left_bracket?(char)
-        stack << char
-      else
-        top = stack.pop
-        return false if get_matching_bracket(top) != char
+        stack.push(char)
+      elsif is_right_bracket?(char)
+        return false unless get_right_bracket(stack.pop) == char
       end
-    end
-    stack.empty?
+      stack
+    end.empty?
   end
 
-  def self.is_bracket?(char)
-    "[](){}".include?(char)
-  end
-
-  def self.get_matching_bracket(bracket)
-    BRACKET_PAIRS[bracket]
+  def self.get_right_bracket(left_bracket)
+    BRACKET_PAIRS[left_bracket]
   end
 
   def self.is_left_bracket?(char)
     BRACKET_PAIRS.keys.include?(char)
   end
+
+  def self.is_right_bracket?(char)
+    BRACKET_PAIRS.values.include?(char)
+  end
 end
+
+class SimpleStack
+  def initialize
+    @stack = []
+  end
+
+  def push(value)
+    stack << value
+  end
+
+  def pop
+    stack.pop
+  end
+
+  def empty?
+    stack.empty?
+  end
+
+  private
+
+  attr_reader :stack
+end
+
