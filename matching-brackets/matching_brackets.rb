@@ -6,18 +6,14 @@ class Brackets
   }
 
   def self.paired?(string)
-    string.split("").inject(SimpleStack.new) do |stack, char|
-      if is_left_bracket?(char)
-        stack.push(char)
-      elsif is_right_bracket?(char)
-        return false unless get_right_bracket(stack.pop) == char
+    string.split("").inject(SimpleStack.new) do |bracket_stack, current_char|
+      if is_left_bracket?(current_char)
+        bracket_stack.push(current_char)
+      elsif is_right_bracket?(current_char)
+        return false unless brackets_match(bracket_stack.pop, current_char)
       end
-      stack
+      bracket_stack
     end.empty?
-  end
-
-  def self.get_right_bracket(left_bracket)
-    BRACKET_PAIRS[left_bracket]
   end
 
   def self.is_left_bracket?(char)
@@ -26,6 +22,16 @@ class Brackets
 
   def self.is_right_bracket?(char)
     BRACKET_PAIRS.values.include?(char)
+  end
+
+  def self.get_right_bracket(left_bracket)
+    BRACKET_PAIRS[left_bracket]
+  end
+
+  private
+
+  def self.brackets_match(left, right)
+    get_right_bracket(left) == right
   end
 end
 
