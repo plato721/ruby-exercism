@@ -5,33 +5,36 @@ class Brackets
     "{" => "}"
   }
 
-  def self.paired?(string)
-    string.split("").inject(SimpleStack.new) do |bracket_stack, current_char|
-      if is_left_bracket?(current_char)
-        bracket_stack.push(current_char)
-      elsif is_right_bracket?(current_char)
-        return false unless brackets_match(bracket_stack.pop, current_char)
-      end
-      bracket_stack
-    end.empty?
-  end
+  class << self
+    def paired?(expression)
+      expression.split("").inject(SimpleStack.new) do |bracket_stack, current_char|
+        if is_left_bracket?(current_char)
+          bracket_stack.push(current_char)
+        elsif is_right_bracket?(current_char)
+          right_bracket_to_match = bracket_stack.pop
+          return false unless brackets_match?(right_bracket_to_match, current_char)
+        end
+        bracket_stack
+      end.empty?
+    end
 
-  def self.is_left_bracket?(char)
-    BRACKET_PAIRS.keys.include?(char)
-  end
+    private
 
-  def self.is_right_bracket?(char)
-    BRACKET_PAIRS.values.include?(char)
-  end
+    def is_left_bracket?(char)
+      BRACKET_PAIRS.keys.include?(char)
+    end
 
-  def self.get_right_bracket(left_bracket)
-    BRACKET_PAIRS[left_bracket]
-  end
+    def is_right_bracket?(char)
+      BRACKET_PAIRS.values.include?(char)
+    end
 
-  private
+    def get_right_bracket(left_bracket)
+      BRACKET_PAIRS[left_bracket]
+    end
 
-  def self.brackets_match(left, right)
-    get_right_bracket(left) == right
+    def brackets_match?(left, right)
+      get_right_bracket(left) == right
+    end
   end
 end
 
