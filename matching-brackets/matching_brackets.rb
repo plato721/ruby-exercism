@@ -7,18 +7,26 @@ class Brackets
 
   class << self
     def paired?(expression)
-      expression.split("").inject(SimpleStack.new) do |bracket_stack, current_char|
-        if is_left_bracket?(current_char)
-          bracket_stack.push(current_char)
-        elsif is_right_bracket?(current_char)
-          right_bracket_to_match = bracket_stack.pop
-          return false unless brackets_match?(right_bracket_to_match, current_char)
-        end
-        bracket_stack
+      expression.split("").each_with_object(SimpleStack.new) do |current_char, bracket_stack|
+        next unless is_bracket?(current_char)
+        return false unless process_bracket(bracket_stack, current_char)
       end.empty?
     end
 
     private
+
+    def process_bracket(bracket_stack, bracket)
+      if is_left_bracket?(bracket)
+        bracket_stack.push(bracket)
+      elsif is_right_bracket?(bracket)
+        left_bracket = bracket_stack.pop
+        brackets_match?(left_bracket, bracket)
+      end
+    end
+
+    def is_bracket?(char)
+      is_left_bracket?(char) || is_right_bracket?(char)
+    end
 
     def is_left_bracket?(char)
       BRACKET_PAIRS.keys.include?(char)
