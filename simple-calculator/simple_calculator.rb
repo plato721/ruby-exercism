@@ -14,14 +14,6 @@ class SimpleCalculator
 
     private
 
-    def get_result_text(first_operand, second_operand, operation, result)
-      "#{first_operand} #{operation} #{second_operand} = #{result}"
-    end
-
-    def get_result(first_operand, operation, second_operand)
-      first_operand.send(operation.to_sym, second_operand)
-    end
-
     def validate_arguments(first_operand, operation, second_operand)
       raise ArgumentError unless valid_operands?(first_operand, second_operand)
       raise UnsupportedOperation unless valid_operation?(operation)
@@ -37,6 +29,14 @@ class SimpleCalculator
 
     def valid_operation?(operation)
       ALLOWED_OPERATIONS.include?(operation)
+    end
+
+    def get_result(first_operand, operation, second_operand)
+      first_operand.send(operation.to_sym, second_operand)
+    end
+
+    def get_result_text(first_operand, second_operand, operation, result)
+      "#{first_operand} #{operation} #{second_operand} = #{result}"
     end
   end
 end
