@@ -19,7 +19,7 @@ class SimpleCalculator
     end
 
     def get_result(first_operand, operation, second_operand)
-      first_operand.to_i.send(operation.to_sym, second_operand.to_i)
+      first_operand.send(operation.to_sym, second_operand)
     end
 
     def validate_arguments(first_operand, operation, second_operand)
