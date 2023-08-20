@@ -2,10 +2,10 @@ class NotMovieClubMemberError < RuntimeError
 end
 
 class Moviegoer
-  ADULT_MIN_AGE = 18
-  SENIOR_DISCOUNT_MIN_AGE = 60
-  STANDARD_TICKET_PRICE = 15
-  DISCOUNT_TICKET_PRICE = 10
+  ADULT_AGE = 18
+  PRICE = 15
+  SENIOR_AGE = 60
+  SENIOR_DISCOUNT = 5
 
   def initialize(age, member: false)
     @age = age
@@ -13,11 +13,15 @@ class Moviegoer
   end
 
   def ticket_price
-    senior? ? DISCOUNT_TICKET_PRICE : STANDARD_TICKET_PRICE
+    senior? ? senior_price : PRICE
   end
 
   private def senior?
-    age >= SENIOR_DISCOUNT_MIN_AGE
+    age >= SENIOR_AGE
+  end
+
+  private def senior_price
+    PRICE - SENIOR_DISCOUNT
   end
 
   def watch_scary_movie?
@@ -25,7 +29,7 @@ class Moviegoer
   end
 
   private def adult?
-    age >= ADULT_MIN_AGE
+    age >= ADULT_AGE
   end
 
   def claim_free_popcorn!
