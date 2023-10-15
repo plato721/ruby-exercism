@@ -1,7 +1,27 @@
-=begin
-Write your code for the 'Darts' exercise in this file. Make the tests in
-`darts_test.rb` pass.
+class Darts
+  attr_reader :x, :y
 
-To get started with TDD, see the `README.md` file in your
-`ruby/darts` directory.
-=end
+  def initialize(x, y)
+    @x = x
+    @y = y
+  end
+
+  def score
+    case distance_from_center
+    when 0..1.0
+      10
+    when 1..5.0
+      5
+    when 5..10.0
+      1
+    else
+      0
+    end
+  end
+
+  private
+
+  def distance_from_center
+    Math.sqrt(x**2 + y**2)
+  end
+end
