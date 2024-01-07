@@ -16,32 +16,44 @@ module Blackjack
       end
     end
 
-    def sum_cards(*cards)
-      cards.sum { |c| parse_card(c) }
-    end
-
     def card_range(card1, card2)
       case sum_cards(card1, card2)
       when 4..11 then "low"
       when 12..16 then "mid"
       when 17..20 then "high"
-      else "blackjack"
+      when 21..21 then "blackjack"
+      else "bust"
       end
     end
 
+    def sum_cards(*cards)
+      cards.sum { |c| parse_card(c) }
+    end
+
     def first_turn(card1, card2, dealer_card)
-      total = sum_cards(card1, card2)
-      dealer_total = sum_cards(dealer_card)
+      dealer_total = parse_card(dealer_card)
       range = card_range(card1, card2)
-      case
-      when total == 22 then "P"
-      when range == "high" then "S"
-      when range == "mid" && dealer_total > 6 then "H"
-      when range == "mid" then "S"
-      when range == "low" then "H"
-      when total == 21 && dealer_total == 11 then "S"
-      else "W"
-      end
+      send("#{range}_turn".to_sym, dealer_total)
+    end
+
+    def low_turn(_)
+      "H"
+    end
+
+    def mid_turn(dealer_value)
+      dealer_value > 6 ? "H" : "S"
+    end
+
+    def high_turn(_)
+      "S"
+    end
+
+    def blackjack_turn(dealer_value)
+      dealer_value == 11 ? "S" : "W"
+    end
+
+    def bust_turn(_)
+      "P"
     end
   end
 end
