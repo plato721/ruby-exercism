@@ -2,16 +2,25 @@ class TwoBucket
   attr_reader :goal_bucket, :other_bucket, :goal,
               :fill_first
 
-  def initialize(first_max, second_max, goal, fill_first)
+  def initialize(first_max, second_max, goal, fill_first, state_after_move = [])
     @fill_first = fill_first
     @goal = goal
-    @bucket1, @bucket2 = create_buckets(first_max, second_max)
-    @pour_service = PourService.new(@bucket1, @bucket2)
+    bucket1, bucket2 = create_buckets(first_max, second_max)
+    # @state_after_move = state_after_move
+    if fill_first == bucket1.name
+      @start_bucket = bucket1
+      @second_bucket = bucket2
+    else
+      @start_bucket = bucket2
+      @second_bucket = bucket1
+    end
+    @pour_service = PourService.new(@start_bucket, @second_bucket)
   end
 
   def moves
-    initial_bucket = fill_first == @bucket1.name ? @bucket1 : @bucket2
-    @pour_service.fill(initial_bucket)
+    return unless @pour_service.can_fill?(@start_bucket)
+
+    @pour_service.fill(@start_bucket)
 
     loop do
       break if goal_met?
@@ -23,18 +32,18 @@ class TwoBucket
       # - empty 2
       # - 1 into 2
       # - 2 into 1
-      if @pour_service.can_pour_1to2?
-        @pour_service.pour_1to2
-      elsif @pour_service.can_pour_2to1?
-        @pour_service.pour_2to1
-      elsif @pour_service.can_fill?(@bucket1)
-        @pour_service.fill(@bucket1)
-      elsif @pour_service.can_fill?(@bucket2)
-        @pour_service.fill(@bucket2)
-      elsif @pour_service.can_empty?(@bucket1)
-        @pour_service.empty(@bucket1)
-      elsif @pour_service.can_empty?(@bucket2)
-        @pour_service.empty(@bucket2)
+      if @pour_service.can_pour_start_into_second?
+        @pour_service.pour_start_into_second
+      elsif @pour_service.can_fill?(@start_bucket)
+        @pour_service.fill(@start_bucket)
+      elsif @pour_service.can_empty?(@start_bucket)
+        @pour_service.empty(@start_bucket)
+      elsif @pour_service.can_empty?(@second_bucket)
+        @pour_service.empty(@second_bucket)
+      elsif @pour_service.can_fill?(@second_bucket)
+        @pour_service.fill(@second_bucket)
+      elsif @pour_service.can_pour_second_into_start?
+        @pour_service.pout_second_into_start
       end
     end
 
@@ -52,23 +61,23 @@ class TwoBucket
   end
 
   def goal_met?
-    @bucket1.current == goal || @bucket2.current == goal
+    @start_bucket.current == goal || @second_bucket.current == goal
   end
 
   def set_final_buckets
-    if @bucket1.current == goal
-      @goal_bucket = "one"
-      @other_bucket = "two"
+    if @start_bucket.current == goal
+      @goal_bucket = @start_bucket.name
+      @other_bucket = @second_bucket.name
     else
-      @goal_bucket = "two"
-      @other_bucket = "one"
+      @goal_bucket = @second_bucket.name
+      @other_bucket = @start_bucket.name
     end
   end
 end
 
 class PourService
-  def initialize(bucket1, bucket2)
-    @state_after_move = []
+  def initialize(bucket1, bucket2, state_after_move = [])
+    @state_after_move = state_after_move
     @bucket1 = bucket1
     @bucket2 = bucket2
   end
@@ -82,7 +91,7 @@ class PourService
                       else
                         [@bucket1, cloned_filled]
                       end
-    !(state_exists?(*new_bucket_pair) || one_empty_one_full?(*new_bucket_pair))
+    !(state_exists?(*new_bucket_pair) || start_empty_second_full?(*new_bucket_pair))
   end
 
   def can_empty?(bucket)
@@ -94,7 +103,7 @@ class PourService
                       else
                         [@bucket1, cloned_empty]
                       end
-    !(state_exists?(*new_bucket_pair) || one_empty_one_full?(*new_bucket_pair))
+    !(state_exists?(*new_bucket_pair) || start_empty_second_full?(*new_bucket_pair))
   end
 
   def empty(bucket)
@@ -107,30 +116,30 @@ class PourService
     update_move_state
   end
 
-  def can_pour_1to2?
-    return false unless !@bucket1.empty? && @bucket2.full?
+  def can_pour_start_into_second?
+    return false unless !@bucket1.empty? && !@bucket2.full?
 
-    bucket1_after_pour, bucket2_after_pour = @bucket1.fill_with_bucket(@bucket2, true)
-
-    !(state_exists?(bucket1_after_pour, bucket2_after_pour) ||
-      one_empty_one_full?(bucket1_after_pour, bucket2_after_pour))
-  end
-
-  def can_pour_2to1?
-    return false unless @bucket2.empty && !@bucket1.full?
-
-    bucket1_after_pour, bucket2_after_pour = @bucket2.fill_with_bucket(@bucket1, true)
+    bucket2_after_pour, bucket1_after_pour = @bucket2.fill_with_bucket(@bucket1, true)
 
     !(state_exists?(bucket1_after_pour, bucket2_after_pour) ||
-      one_empty_one_full?(bucket1_after_pour, bucket2_after_pour))
+      start_empty_second_full?(bucket1_after_pour, bucket2_after_pour))
   end
 
-  def pour_1to2
+  def can_pour_second_into_start?
+    return false unless !@bucket2.empty && !@bucket1.full?
+
+    bucket2_after_pour, bucket1_after_pour = @bucket1.fill_with_bucket(@bucket2, true)
+
+    !(state_exists?(bucket1_after_pour, bucket2_after_pour) ||
+      start_empty_second_full?(bucket1_after_pour, bucket2_after_pour))
+  end
+
+  def pour_start_into_second
     @bucket2.fill_with_bucket(@bucket1)
     update_move_state
   end
 
-  def pour_2to1
+  def pour_second_into_start
     @bucket1.fill_with_bucket(@bucket2)
     update_move_state
   end
@@ -145,9 +154,8 @@ class PourService
     @state_after_move.find { |m| m[0] == bucket1.current && m[1] == bucket2.current }
   end
 
-  def one_empty_one_full?(new_bucket1, new_bucket2)
-    new_bucket1.empty? && new_bucket2.full? ||
-      new_bucket1.full? && new_bucket2.empty?
+  def start_empty_second_full?(new_start_bucket, new_second_bucket)
+    new_start_bucket.empty? && new_second_bucket.full?
   end
 
   def last_state
