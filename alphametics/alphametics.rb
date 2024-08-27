@@ -8,12 +8,11 @@ To get started with TDD, see the `README.md` file in your
 class Alphametics
   def self.solve(puzzle)
     adder = Adder.new(puzzle)
-    tester = Tester.new(puzzle)
 
     loop do
       return {} unless adder.compute_next_map
 
-      if tester.solution?(adder.cur_map)
+      if Tester.solution?(puzzle, adder.cur_map)
         return adder.cur_map
       end
     end
@@ -84,7 +83,7 @@ class Alphametics
     end
 
     def get_value_wheels
-      values = @letters.map do |l|
+      @letters.map do |l|
         if @leading_letters.include?(l)
           [*1..9]
         else
@@ -108,22 +107,18 @@ class Alphametics
   end
 
   class Tester
-    def initialize(puzzle)
+    def self.solution?(puzzle, mapping)
       components = puzzle.split(/\W+/)
-      @goal = components.pop
-      @addends = components
-    end
-
-    def solution?(mapping)
-      left_side = @addends.inject(0) do |acc, word|
-        acc += word_to_int(word, mapping)
+      goal = components.pop
+      addends = components
+      left_side = addends.inject(0) do |acc, word|
+        acc + word_to_int(word, mapping)
       end
-      right_side = word_to_int(@goal, mapping)
-
+      right_side = word_to_int(goal, mapping)
       left_side == right_side
     end
 
-    def word_to_int(word, mapping)
+    def self.word_to_int(word, mapping)
       word.split('').reduce('') do |acc, letter|
         acc << mapping[letter].to_s
       end.to_i
