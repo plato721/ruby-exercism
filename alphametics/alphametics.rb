@@ -24,10 +24,6 @@ class Alphametics
     end
   end
 
-  # yeah, this doesn't really work as such, but it's just a visual marker that only .solve is
-  # the public interface
-  private
-
   def self.get_letters(puzzle)
     puzzle.split(/\W+/).join.split('').uniq.sort
   end
@@ -43,10 +39,6 @@ class Alphametics
     @addends = components
   end
 
-  def get_leading_letters(components)
-    components.map { |word| word[0] }
-  end
-
   def solution?(mapping)
     return false unless valid?(mapping)
 
@@ -56,6 +48,12 @@ class Alphametics
     right_side = word_to_int(@goal, mapping)
 
     left_side == right_side
+  end
+
+  private
+
+  def get_leading_letters(components)
+    components.map { |word| word[0] }
   end
 
   def word_to_int(word, mapping)
