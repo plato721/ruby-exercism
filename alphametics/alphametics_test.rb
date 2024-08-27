@@ -21,21 +21,18 @@ class AlphameticsTest < Minitest::Test
   end
 
   def test_puzzle_with_two_digits_final_carry
-    skip
     puzzle = 'A + A + A + A + A + A + A + A + A + A + A + B == BCC'
     expected = { 'A' => 9, 'B' => 1, 'C' => 0 }
     assert_equal expected, Alphametics.solve(puzzle)
   end
 
   def test_puzzle_with_four_letters
-    skip
     puzzle = 'AS + A == MOM'
     expected = { 'A' => 9, 'M' => 1, 'O' => 0, 'S' => 2 }
     assert_equal expected, Alphametics.solve(puzzle)
   end
 
   def test_puzzle_with_six_letters
-    skip
     puzzle = 'NO + NO + TOO == LATE'
     expected = { 'A' => 0, 'E' => 2, 'L' => 1, 'N' => 7,
                  'O' => 4, 'T' => 9 }
@@ -43,7 +40,6 @@ class AlphameticsTest < Minitest::Test
   end
 
   def test_puzzle_with_seven_letters
-    skip
     puzzle = 'HE + SEES + THE == LIGHT'
     expected = { 'E' => 4, 'G' => 2, 'H' => 5, 'I' => 0,
                  'L' => 1, 'S' => 9, 'T' => 7 }

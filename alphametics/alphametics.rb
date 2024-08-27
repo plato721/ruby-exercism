@@ -9,11 +9,11 @@ class Alphametics
   def self.solve(puzzle)
     tester = get_tester(puzzle)
     letters = get_letters(puzzle)
-    adder = Base26Adder.new(letters.length)
+    adder = Adder.new(letters.length)
     cur_map = letters.zip(adder.digits).to_h
 
     loop do
-      if unique_codes?(cur_map) && tester.solution?(cur_map)
+      if tester.solution?(cur_map)
         return cur_map
       else
         cur_codes = adder.increment
@@ -22,10 +22,6 @@ class Alphametics
         cur_map = letters.zip(cur_codes).to_h
       end
     end
-  end
-
-  def self.unique_codes?(solution)
-    solution.values.sort == solution.values.uniq.sort
   end
 
   def self.get_letters(puzzle)
@@ -38,11 +34,17 @@ class Alphametics
   end
 
   def initialize(components)
+    @leading_letters = get_leading_letters(components)
     @goal = components.pop
     @addends = components
   end
 
+  def get_leading_letters(components)
+    components.map { |word| word[0] }
+  end
+
   def solution?(mapping)
+    return false unless valid?(mapping)
     left_side = @addends.inject(0) do |acc, word|
       acc += word_to_int(word, mapping)
     end
@@ -57,10 +59,22 @@ class Alphametics
     end.to_i
   end
 
-  class Base26Adder
+  def valid?(mapping)
+    unique_codes?(mapping) && !leading_zeros?(mapping)
+  end
+
+  def leading_zeros?(mapping)
+    @leading_letters.any? { |l| mapping[l].zero? }
+  end
+
+  def unique_codes?(solution)
+    solution.values.sort == solution.values.uniq.sort
+  end
+
+  class Adder
     attr_reader :digits
 
-    BASE = 26
+    BASE = 10
 
     def initialize(number_digits)
       @number_digits = number_digits
