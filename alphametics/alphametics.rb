@@ -74,23 +74,21 @@ class Alphametics
   class Adder
     attr_reader :digits
 
-    BASE = 10
-
     def initialize(number_digits)
       @number_digits = number_digits
       @digits = [*1..number_digits].map { 0 }
+      @sum = 0
     end
 
     def increment
-      (@number_digits - 1).downto(0).each do |place|
-        if @digits[place] + 1 < BASE
-          @digits[place] += 1
-          return @digits
-        else
-          @digits[place] = 0
-        end
-      end
-      false # out of range -- got through all the possibilities
+      @sum += 1
+      digits = @sum.to_s
+
+      # out of range -- got through all the possibilities
+      return false unless digits.length <= @number_digits
+
+      @digits = digits.rjust(@number_digits, '0')
+                      .split('').map(&:to_i)
     end
   end
 end
