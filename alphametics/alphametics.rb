@@ -24,6 +24,10 @@ class Alphametics
     end
   end
 
+  # yeah, this doesn't really work as such, but it's just a visual marker that only .solve is
+  # the public interface
+  private
+
   def self.get_letters(puzzle)
     puzzle.split(/\W+/).join.split('').uniq.sort
   end
@@ -45,6 +49,7 @@ class Alphametics
 
   def solution?(mapping)
     return false unless valid?(mapping)
+
     left_side = @addends.inject(0) do |acc, word|
       acc += word_to_int(word, mapping)
     end
@@ -63,14 +68,19 @@ class Alphametics
     unique_codes?(mapping) && !leading_zeros?(mapping)
   end
 
+  # The start of a word can't be a zero
   def leading_zeros?(mapping)
     @leading_letters.any? { |l| mapping[l].zero? }
   end
 
+  # Each value 0 - 9 can only be assigned to one letter at a time
   def unique_codes?(solution)
     solution.values.sort == solution.values.uniq.sort
   end
 
+  # Creates an array of length number_digits starting at [0, 0, ..., 0]
+  # #increment will then count up to the max of [9, 9, ..., 9], returning
+  # false when it is out of range
   class Adder
     attr_reader :digits
 
