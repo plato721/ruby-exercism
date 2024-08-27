@@ -7,96 +7,127 @@ To get started with TDD, see the `README.md` file in your
 =end
 class Alphametics
   def self.solve(puzzle)
-    tester = get_tester(puzzle)
-    letters = get_letters(puzzle)
-    adder = Adder.new(letters.length)
-    cur_map = letters.zip(adder.digits).to_h
+    adder = Adder.new(puzzle)
+    tester = Tester.new(puzzle)
 
     loop do
-      if tester.solution?(cur_map)
-        return cur_map
-      else
-        cur_codes = adder.increment
-        return {} unless cur_codes
+      return {} unless adder.compute_next_map
 
-        cur_map = letters.zip(cur_codes).to_h
+      if tester.solution?(adder.cur_map)
+        return adder.cur_map
       end
     end
-  end
-
-  def self.get_letters(puzzle)
-    puzzle.split(/\W+/).join.split('').uniq.sort
-  end
-
-  def self.get_tester(puzzle)
-    components = puzzle.split(/\W+/)
-    new(components)
-  end
-
-  def initialize(components)
-    @leading_letters = get_leading_letters(components)
-    @goal = components.pop
-    @addends = components
-  end
-
-  def solution?(mapping)
-    return false unless valid?(mapping)
-
-    left_side = @addends.inject(0) do |acc, word|
-      acc += word_to_int(word, mapping)
-    end
-    right_side = word_to_int(@goal, mapping)
-
-    left_side == right_side
-  end
-
-  private
-
-  def get_leading_letters(components)
-    components.map { |word| word[0] }
-  end
-
-  def word_to_int(word, mapping)
-    word.split('').reduce('') do |acc, letter|
-      acc << mapping[letter].to_s
-    end.to_i
-  end
-
-  def valid?(mapping)
-    unique_codes?(mapping) && !leading_zeros?(mapping)
-  end
-
-  # The start of a word can't be a zero
-  def leading_zeros?(mapping)
-    @leading_letters.any? { |l| mapping[l].zero? }
-  end
-
-  # Each value 0 - 9 can only be assigned to one letter at a time
-  def unique_codes?(solution)
-    solution.values.sort == solution.values.uniq.sort
   end
 
   # Creates an array of length number_digits starting at [0, 0, ..., 0]
   # #increment will then count up to the max of [9, 9, ..., 9], returning
   # false when it is out of range
   class Adder
-    attr_reader :digits
+    attr_reader :cur_map
 
-    def initialize(number_digits)
-      @number_digits = number_digits
-      @digits = [*1..number_digits].map { 0 }
-      @sum = 0
+    def initialize(puzzle)
+      @letters = get_letters(puzzle)
+      @cur_value_indexes = @letters.map { 0 }
+
+      components = puzzle.split(/\W+/)
+      @leading_letters = get_leading_letters(components)
+      @value_wheels = get_value_wheels
+      @max_indexes = get_max_indexes
     end
 
-    def increment
-      @sum += 1
-      digits = @sum.to_s
+    def get_max_indexes
+      @value_wheels.map { |wheel| wheel.length - 1 }
+    end
 
-      # out of range -- got through all the possibilities
-      return false unless digits.length <= @number_digits
+    def compute_next_map
+      if @cur_map.nil?
+        @cur_map = get_map
+        return true if unique_codes?
+      end
 
-      @digits = digits.rjust(@number_digits, '0')
-                      .split('').map(&:to_i)
+      @wheel_index ||= @letters.length - 1
+      loop do
+        if @cur_value_indexes[@wheel_index] + 1 <= @max_indexes[@wheel_index]
+          @cur_value_indexes[@wheel_index] += 1
+          @cur_map = get_map
+          return true if unique_codes?
+        else
+          loop do
+            @cur_value_indexes[@wheel_index] = 0
+            @wheel_index -= 1
+            return false if @wheel_index < 0
+
+            if @cur_value_indexes[@wheel_index] + 1 <= @max_indexes[@wheel_index]
+              @cur_value_indexes[@wheel_index] += 1
+              @wheel_index = @letters.length - 1 # reset to point to right most wheel
+              @cur_map = get_map
+              return true if unique_codes?
+              break
+            end
+
+          end
+
+        end
+      end
+
+      # we've gone through the wheels - nothing more to increment
+      return false
+    end
+
+    def get_map
+      @letters.map.with_index do |letter, i|
+        possibles_for_letter = @value_wheels[i]
+        current_letter_position = @cur_value_indexes[i]
+        current_letter_value = possibles_for_letter[current_letter_position]
+        [letter, current_letter_value]
+      end.to_h
+    end
+
+    def get_value_wheels
+      values = @letters.map do |l|
+        if @leading_letters.include?(l)
+          [*1..9]
+        else
+          [*0..9]
+        end
+      end
+    end
+
+    def get_letters(puzzle)
+      puzzle.split(/\W+/).join.split('').uniq.sort
+    end
+
+    def get_leading_letters(components)
+      components.map { |word| word[0] }
+    end
+
+    # Each value 0 - 9 can only be assigned to one letter at a time
+    def unique_codes?
+      @cur_map.values.sort == @cur_map.values.uniq.sort
     end
   end
+
+  class Tester
+    def initialize(puzzle)
+      components = puzzle.split(/\W+/)
+      @goal = components.pop
+      @addends = components
+    end
+
+    def solution?(mapping)
+      left_side = @addends.inject(0) do |acc, word|
+        acc += word_to_int(word, mapping)
+      end
+      right_side = word_to_int(@goal, mapping)
+
+      left_side == right_side
+    end
+
+    def word_to_int(word, mapping)
+      word.split('').reduce('') do |acc, letter|
+        acc << mapping[letter].to_s
+      end.to_i
+    end
+  end
+
 end
