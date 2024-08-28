@@ -19,6 +19,7 @@ class Alphametics
 
     def initialize(puzzle)
       @puzzle = puzzle
+      @tester = Tester.new(puzzle)
     end
 
     def get_solution
@@ -54,7 +55,7 @@ class Alphametics
 
     def solution?(possibles_group)
       cur_map = group_to_solution(possibles_group)
-      Tester.solution?(@puzzle, cur_map)
+      @tester.solution?(cur_map)
     end
 
     def get_letters(puzzle)
@@ -73,18 +74,20 @@ class Alphametics
   end
 
   class Tester
-    def self.solution?(puzzle, mapping)
+    def initialize(puzzle)
       components = puzzle.split(/\W+/)
-      goal = components.pop
-      addends = components
-      left_side = addends.inject(0) do |acc, word|
+      @goal = components.pop
+      @addends = components
+    end
+    def solution?(mapping)
+      left_side = @addends.inject(0) do |acc, word|
         acc + word_to_int(word, mapping)
       end
-      right_side = word_to_int(goal, mapping)
+      right_side = word_to_int(@goal, mapping)
       left_side == right_side
     end
 
-    def self.word_to_int(word, mapping)
+    def word_to_int(word, mapping)
       word.split('').reduce('') do |acc, letter|
         acc << mapping[letter].to_s
       end.to_i
