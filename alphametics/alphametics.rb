@@ -8,14 +8,7 @@ To get started with TDD, see the `README.md` file in your
 class Alphametics
   def self.solve(puzzle)
     adder = Adder.new(puzzle)
-
-    loop do
-      return {} unless adder.compute_next_map
-
-      if Tester.solution?(puzzle, adder.cur_map)
-        return adder.cur_map
-      end
-    end
+    adder.get_solution
   end
 
   # Creates an array of length number_digits starting at [0, 0, ..., 0]
@@ -25,30 +18,19 @@ class Alphametics
     attr_reader :cur_map
 
     def initialize(puzzle)
-      @letters = get_letters(puzzle)
+      @puzzle = puzzle
+    end
 
-      components = puzzle.split(/\W+/)
+    def get_solution
+      @letters = get_letters(@puzzle)
+
+      components = @puzzle.split(/\W+/)
       @leading_letters = get_leading_letters(components)
 
-      @possibles = get_possibles
-      # raise "#{@possibles}"
-      @maps = get_maps
-
+      compute_solution
     end
 
-    def get_maps
-      @possibles.map do |possibles_group|
-        possibles_group.map do |possibles_pair|
-          [possibles_pair[0], possibles_pair[1].to_i]
-        end.to_h
-      end
-    end
-
-    def compute_next_map
-      @cur_map = @maps.shift
-    end
-
-    def get_possibles
+    def compute_solution
       letter_possibles = @letters.map do |l|
         if @leading_letters.include?(l)
           [*"#{l}1".."#{l}9"]
@@ -57,14 +39,22 @@ class Alphametics
         end
       end
 
-      letter_possibles[1..-1].inject(letter_possibles[0]) do |all_possibles, one_letter_possibles|
+      solution_group = letter_possibles[1..-1].inject(letter_possibles[0]) do |all_possibles, one_letter_possibles|
         all_possibles.product(one_letter_possibles)
-      end.map do |possibles_group|
-        possibles_group.flatten.sort
-      end.uniq
-         .select do |possibles_group|
-        possibles_group.uniq { |pg| pg[-1] } == possibles_group
+      end.find do |possibles_group|
+        possibles_group = possibles_group.flatten
+        possibles_group.uniq { |pg| pg[-1] } == possibles_group &&
+          solution?(possibles_group)
       end
+
+      return {} unless solution_group
+
+      group_to_solution(solution_group.flatten.sort)
+    end
+
+    def solution?(possibles_group)
+      cur_map = group_to_solution(possibles_group)
+      Tester.solution?(@puzzle, cur_map)
     end
 
     def get_letters(puzzle)
@@ -73,6 +63,12 @@ class Alphametics
 
     def get_leading_letters(components)
       components.map { |word| word[0] }
+    end
+
+    def group_to_solution(possibles_group)
+      possibles_group.map do |possibles_pair|
+        [possibles_pair[0], possibles_pair[1].to_i]
+      end.to_h
     end
   end
 
