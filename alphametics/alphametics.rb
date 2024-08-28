@@ -26,69 +26,44 @@ class Alphametics
 
     def initialize(puzzle)
       @letters = get_letters(puzzle)
-      @cur_value_indexes = @letters.map { 0 }
 
       components = puzzle.split(/\W+/)
       @leading_letters = get_leading_letters(components)
-      @value_wheels = get_value_wheels
-      @max_indexes = get_max_indexes
+
+      @possibles = get_possibles
+      # raise "#{@possibles}"
+      @maps = get_maps
+
     end
 
-    def get_max_indexes
-      @value_wheels.map { |wheel| wheel.length - 1 }
+    def get_maps
+      @possibles.map do |possibles_group|
+        possibles_group.map do |possibles_pair|
+          [possibles_pair[0], possibles_pair[1].to_i]
+        end.to_h
+      end
     end
 
     def compute_next_map
-      if @cur_map.nil?
-        @cur_map = get_map
-        return true if unique_codes?
-      end
-
-      @wheel_index ||= @letters.length - 1
-      loop do
-        if @cur_value_indexes[@wheel_index] + 1 <= @max_indexes[@wheel_index]
-          @cur_value_indexes[@wheel_index] += 1
-          @cur_map = get_map
-          return true if unique_codes?
-        else
-          loop do
-            @cur_value_indexes[@wheel_index] = 0
-            @wheel_index -= 1
-            return false if @wheel_index < 0
-
-            if @cur_value_indexes[@wheel_index] + 1 <= @max_indexes[@wheel_index]
-              @cur_value_indexes[@wheel_index] += 1
-              @wheel_index = @letters.length - 1 # reset to point to right most wheel
-              @cur_map = get_map
-              return true if unique_codes?
-              break
-            end
-
-          end
-
-        end
-      end
-
-      # we've gone through the wheels - nothing more to increment
-      return false
+      @cur_map = @maps.shift
     end
 
-    def get_map
-      @letters.map.with_index do |letter, i|
-        possibles_for_letter = @value_wheels[i]
-        current_letter_position = @cur_value_indexes[i]
-        current_letter_value = possibles_for_letter[current_letter_position]
-        [letter, current_letter_value]
-      end.to_h
-    end
-
-    def get_value_wheels
-      @letters.map do |l|
+    def get_possibles
+      letter_possibles = @letters.map do |l|
         if @leading_letters.include?(l)
-          [*1..9]
+          [*"#{l}1".."#{l}9"]
         else
-          [*0..9]
+          [*"#{l}0".."#{l}9"]
         end
+      end
+
+      letter_possibles[1..-1].inject(letter_possibles[0]) do |all_possibles, one_letter_possibles|
+        all_possibles.product(one_letter_possibles)
+      end.map do |possibles_group|
+        possibles_group.flatten.sort
+      end.uniq
+         .select do |possibles_group|
+        possibles_group.uniq { |pg| pg[-1] } == possibles_group
       end
     end
 
@@ -98,11 +73,6 @@ class Alphametics
 
     def get_leading_letters(components)
       components.map { |word| word[0] }
-    end
-
-    # Each value 0 - 9 can only be assigned to one letter at a time
-    def unique_codes?
-      @cur_map.values.sort == @cur_map.values.uniq.sort
     end
   end
 
