@@ -1,34 +1,50 @@
 class Sieve
-  attr_reader :primes
-
   def initialize(max)
     @max = max
     @primes = []
-    @sieve = Array.new(@max)
-    seed
-    populate
+    @sieve = initialize_sieve
+  end
+
+  def primes
+    build_sieve
+    apply_sieve
   end
 
   private
 
-  def populate
+  def build_sieve
     loop do
-      next_prime != nil ? @primes << next_prime : break
-      sieve(@primes.last)
+      next_prime = get_next_prime
+      break unless next_prime
+
+      eliminate_multiples(next_prime)
     end
   end
 
-  def sieve(prime)
-    @sieve.each_index { |i| @sieve[i] = i if i % prime == 0 }
+  def eliminate_multiples(prime)
+    @sieve[prime] = true
+    next_non_prime = prime + prime
+
+    loop do
+      break if next_non_prime > @max
+
+      @sieve[next_non_prime] = false
+      next_non_prime += prime
+    end
   end
 
-  def next_prime
-    @sieve.index(nil)
+  def apply_sieve
+    [*0..@max].zip(@sieve)
+              .select { |_potential_prime, is_prime| is_prime }
+              .map { |prime, _is_prime| prime }
   end
 
-  def seed
-    @sieve[0] = 0 # 0 and 1 need to be marked so they aren't
-    @sieve[1] = 1 #   discovered as primes.
+  def get_next_prime
+    @sieve.index("unknown")
+  end
+
+  def initialize_sieve
+    [false, false] + [*2..@max].map { |_| "unknown" }
   end
 end
 
