@@ -10,18 +10,22 @@ class Sieve
   end
 
   private
+
   def populate
     loop do
       next_prime != nil ? @primes << next_prime : break
       sieve(@primes.last)
     end
   end
+
   def sieve(prime)
     @sieve.each_index { |i| @sieve[i] = i if i % prime == 0 }
   end
+
   def next_prime
     @sieve.index(nil)
   end
+
   def seed
     @sieve[0] = 0 # 0 and 1 need to be marked so they aren't
     @sieve[1] = 1 #   discovered as primes.
